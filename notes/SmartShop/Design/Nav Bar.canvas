@@ -1,0 +1,9 @@
+{
+	"nodes":[
+		{"id":"375b056c5314c178","x":-220,"y":100,"width":250,"height":60,"type":"text","text":"Sell"},
+		{"id":"9ccfa1a25369d35d","x":60,"y":100,"width":250,"height":60,"type":"text","text":"Orders"},
+		{"id":"13df8bd134c071a5","x":340,"y":100,"width":250,"height":60,"type":"text","text":"Account"},
+		{"id":"85444a67cbe84e7f","x":-500,"y":100,"width":250,"height":60,"type":"text","text":"Shop"}
+	],
+	"edges":[]
+}
