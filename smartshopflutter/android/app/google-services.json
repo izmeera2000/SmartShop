@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "955361980940",
+    "project_id": "smart-shop-ac29c",
+    "storage_bucket": "smart-shop-ac29c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:955361980940:android:b578e6cc050401f128b429",
+        "android_client_info": {
+          "package_name": "com.adtectaiping.smartshop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbOSjGHvFhl76xfTrlQOyjZZdmSNANubQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
