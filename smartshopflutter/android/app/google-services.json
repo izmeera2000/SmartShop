@@ -12,7 +12,12 @@
           "package_name": "com.adtectaiping.smartshop"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "955361980940-08b731f44m5lkl0lkpe3psbgvc5ooa24.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBbOSjGHvFhl76xfTrlQOyjZZdmSNANubQ"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "955361980940-08b731f44m5lkl0lkpe3psbgvc5ooa24.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
