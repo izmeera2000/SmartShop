@@ -27,8 +27,8 @@ android {
         applicationId = "com.adtectaiping.smartshop"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 23
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -44,4 +44,15 @@ android {
 
 flutter {
     source = "../.."
+}
+dependencies {
+    // Use Firebase BoM (Bill of Materials) to keep all Firebase versions consistent
+    implementation platform('com.google.firebase:firebase-bom:33.12.0')
+
+    // Example: Add Analytics or any other Firebase product
+    implementation 'com.google.firebase:firebase-analytics'
+
+    // Add more here, like:
+    // implementation 'com.google.firebase:firebase-auth'
+    // implementation 'com.google.firebase:firebase-firestore'
 }
