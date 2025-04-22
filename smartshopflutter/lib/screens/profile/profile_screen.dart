@@ -47,7 +47,7 @@ class ProfileScreen extends StatelessWidget {
               press: () {
                 Navigator.pushNamedAndRemoveUntil(
                   context,
-                  "/sign_in", // using the string route name directly
+                  "/home", // using the string route name directly
                   (route) => false,
                 );
               },

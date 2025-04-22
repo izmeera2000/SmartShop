@@ -135,41 +135,44 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           FormError(errors: errors),
           const SizedBox(height: 20),
           ElevatedButton(
-           onPressed: () async {
-  if (_formKey.currentState!.validate()) {
-    _formKey.currentState!.save();
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
 
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .set({
-              'firstName': firstName,
-              'lastName': lastName,
-              'phoneNumber': phoneNumber,
-              'address': address,
-              'email': user.email,
-              'uid': user.uid,
-              'createdAt': FieldValue.serverTimestamp(),
-            });
+                try {
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user != null) {
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.uid)
+                        .set({
+                      'firstName': firstName,
+                      'lastName': lastName,
+                      'phoneNumber': phoneNumber,
+                      'address': address,
+                      'email': user.email,
+                      'uid': user.uid,
+                      'createdAt': FieldValue.serverTimestamp(),
+                    });
 
-        Navigator.pushNamed(context, OtpScreen.routeName);
-      } else {
-        // Handle not logged in
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User not logged in")),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error saving profile: $e")),
-      );
-    }
-  }
-},
-
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      "/sign_in", // using the string route name directly
+                      (route) => false,
+                    );
+                  } else {
+                    // Handle not logged in
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("User not logged in")),
+                    );
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Error saving profile: $e")),
+                  );
+                }
+              }
+            },
             child: const Text("Continue"),
           ),
         ],
