@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
@@ -6,6 +7,8 @@ import '../../../constants.dart';
 import '../../../helper/keyboard.dart';
 import '../../forgot_password/forgot_password_screen.dart';
 import '../../login_success/login_success_screen.dart';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class SignForm extends StatefulWidget {
   const SignForm({super.key});
@@ -131,12 +134,34 @@ class _SignFormState extends State<SignForm> {
           FormError(errors: errors),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                // if all are valid then go to success screen
                 KeyboardUtil.hideKeyboard(context);
-                Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+
+                try {
+                  final UserCredential userCredential =
+                      await _auth.signInWithEmailAndPassword(
+                    email: email!,
+                    password: password!,
+                  );
+
+                  // Navigate to success screen or dashboard
+                  Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+                } on FirebaseAuthException catch (e) {
+                  String errorMessage;
+                  if (e.code == 'user-not-found') {
+                    errorMessage = 'No user found for that email.';
+                  } else if (e.code == 'wrong-password') {
+                    errorMessage = 'Wrong password provided.';
+                  } else {
+                    errorMessage = e.message ?? 'Authentication failed';
+                  }
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(errorMessage)),
+                  );
+                }
               }
             },
             child: const Text("Continue"),

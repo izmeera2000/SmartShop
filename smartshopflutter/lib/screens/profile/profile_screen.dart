@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:smartshopflutter/routes.dart';
 
 import 'components/profile_menu.dart';
 import 'components/profile_pic.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfileScreen extends StatelessWidget {
   static String routeName = "/profile";
@@ -42,7 +44,13 @@ class ProfileScreen extends StatelessWidget {
             ProfileMenu(
               text: "Log Out",
               icon: "assets/icons/Log out.svg",
-              press: () {},
+              press: () {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  "/sign_in", // using the string route name directly
+                  (route) => false,
+                );
+              },
             ),
           ],
         ),

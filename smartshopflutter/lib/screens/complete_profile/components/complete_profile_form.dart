@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
@@ -133,11 +135,41 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           FormError(errors: errors),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                Navigator.pushNamed(context, OtpScreen.routeName);
-              }
-            },
+           onPressed: () async {
+  if (_formKey.currentState!.validate()) {
+    _formKey.currentState!.save();
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .set({
+              'firstName': firstName,
+              'lastName': lastName,
+              'phoneNumber': phoneNumber,
+              'address': address,
+              'email': user.email,
+              'uid': user.uid,
+              'createdAt': FieldValue.serverTimestamp(),
+            });
+
+        Navigator.pushNamed(context, OtpScreen.routeName);
+      } else {
+        // Handle not logged in
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("User not logged in")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error saving profile: $e")),
+      );
+    }
+  }
+},
+
             child: const Text("Continue"),
           ),
         ],
