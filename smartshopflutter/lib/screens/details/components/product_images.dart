@@ -17,6 +17,7 @@ class ProductImages extends StatefulWidget {
 
 class _ProductImagesState extends State<ProductImages> {
   int selectedImage = 0;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -25,52 +26,55 @@ class _ProductImagesState extends State<ProductImages> {
           width: 238,
           child: AspectRatio(
             aspectRatio: 1,
-            child: Image.asset(widget.product.images[selectedImage]),
+            child: Image.network(
+              widget.product.images[selectedImage],
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image, size: 60),
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) return child;
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
           ),
         ),
-        // SizedBox(height: 20),
+        const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ...List.generate(
-              widget.product.images.length,
-              (index) => SmallProductImage(
-                isSelected: index == selectedImage,
-                press: () {
-                  setState(() {
-                    selectedImage = index;
-                  });
-                },
-                image: widget.product.images[index],
-              ),
+          children: List.generate(
+            widget.product.images.length,
+            (index) => SmallProductImage(
+              isSelected: index == selectedImage,
+              press: () {
+                setState(() {
+                  selectedImage = index;
+                });
+              },
+              imageUrl: widget.product.images[index],
             ),
-          ],
-        )
+          ),
+        ),
       ],
     );
   }
 }
 
-class SmallProductImage extends StatefulWidget {
-  const SmallProductImage(
-      {super.key,
-      required this.isSelected,
-      required this.press,
-      required this.image});
+class SmallProductImage extends StatelessWidget {
+  const SmallProductImage({
+    super.key,
+    required this.isSelected,
+    required this.press,
+    required this.imageUrl,
+  });
 
   final bool isSelected;
   final VoidCallback press;
-  final String image;
+  final String imageUrl;
 
-  @override
-  State<SmallProductImage> createState() => _SmallProductImageState();
-}
-
-class _SmallProductImageState extends State<SmallProductImage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.press,
+      onTap: press,
       child: AnimatedContainer(
         duration: defaultDuration,
         margin: const EdgeInsets.only(right: 16),
@@ -81,9 +85,19 @@ class _SmallProductImageState extends State<SmallProductImage> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-              color: kPrimaryColor.withOpacity(widget.isSelected ? 1 : 0)),
+            color: kPrimaryColor.withOpacity(isSelected ? 1 : 0),
+          ),
         ),
-        child: Image.asset(widget.image),
+        child: Image.network(
+          imageUrl,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.broken_image, size: 24),
+          loadingBuilder: (context, child, progress) {
+            if (progress == null) return child;
+            return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+          },
+        ),
       ),
     );
   }

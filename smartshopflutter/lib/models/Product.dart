@@ -1,176 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Product {
-  final int id;
-  final String title, description;
+  final String id;
+  final String title;
+  final String description;
   final List<String> images;
   final List<Color> colors;
-  final double rating, price;
-  final bool isFavourite, isPopular;
+  final double rating;
+  final double price;
+  final bool isFavourite;
+  final bool isPopular;
 
   Product({
     required this.id,
+    required this.title,
+    required this.description,
     required this.images,
     required this.colors,
-    this.rating = 0.0,
-    this.isFavourite = false,
-    this.isPopular = false,
-    required this.title,
+    required this.rating,
     required this.price,
-    required this.description,
+    required this.isFavourite,
+    required this.isPopular,
   });
+
+  // Method to parse hex color string to Color with error handling
+  static Color hexToColor(String hex) {
+    try {
+      final colorString = hex.replaceAll('#', ''); // Remove hash if present
+      if (colorString.length == 6) {
+        return Color(int.parse('0xFF$colorString', radix: 16)); // Add 0xFF for full opacity
+      } else {
+        throw FormatException('Invalid hex color format');
+      }
+    } catch (e) {
+      // Return a default color if the hex is invalid
+      print("Error parsing hex color: $e");
+      return Colors.grey; // Default fallback color
+    }
+  }
+
+  // Factory method to create Product from Firestore document
+  factory Product.fromFirestore(Map<String, dynamic> data, String docId) {
+    // Safely convert colors from Firestore to List<Color>
+    List<Color> colors = (data['colors'] as List<dynamic>)
+        .map((hex) => hexToColor(hex.toString())) // Convert hex to Color
+        .toList();
+
+    return Product(
+      id: docId,
+      title: data['title'] ?? 'Untitled', // Default title if not found
+      description: data['description'] ?? 'No description available',
+      images: List<String>.from(data['images'] ?? []), // Default empty list if no images
+      colors: colors,
+      rating: (data['rating'] as num?)?.toDouble() ?? 0.0, // Default rating if null
+      price: (data['price'] as num?)?.toDouble() ?? 0.0,  // Default price if null
+      isFavourite: data['isFavourite'] ?? false, // Default false if not found
+      isPopular: data['isPopular'] ?? false,   // Default false if not found
+    );
+  }
 }
-
-// Our demo Products
-
-List<Product> demoProducts = [
-  Product(
-    id: 1,
-    images: [
-      "assets/images/ps4_console_white_1.png",
-      "assets/images/ps4_console_white_2.png",
-      "assets/images/ps4_console_white_3.png",
-      "assets/images/ps4_console_white_4.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Wireless Controller for PS4™",
-    price: 64.99,
-    description: description,
-    rating: 4.8,
-    isFavourite: true,
-    isPopular: true,
-  ),
-  Product(
-    id: 2,
-    images: [
-      "assets/images/Image Popular Product 2.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Nike Sport White - Man Pant",
-    price: 50.5,
-    description: description,
-    rating: 4.1,
-    isPopular: true,
-  ),
-  Product(
-    id: 3,
-    images: [
-      "assets/images/glap.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Gloves XC Omega - Polygon",
-    price: 36.55,
-    description: description,
-    rating: 4.1,
-    isFavourite: true,
-    isPopular: true,
-  ),
-  Product(
-    id: 4,
-    images: [
-      "assets/images/wireless headset.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Logitech Head",
-    price: 20.20,
-    description: description,
-    rating: 4.1,
-    isFavourite: true,
-  ),
-  Product(
-    id: 1,
-    images: [
-      "assets/images/ps4_console_white_1.png",
-      "assets/images/ps4_console_white_2.png",
-      "assets/images/ps4_console_white_3.png",
-      "assets/images/ps4_console_white_4.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Wireless Controller for PS4™",
-    price: 64.99,
-    description: description,
-    rating: 4.8,
-    isFavourite: true,
-    isPopular: true,
-  ),
-  Product(
-    id: 2,
-    images: [
-      "assets/images/Image Popular Product 2.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Nike Sport White - Man Pant",
-    price: 50.5,
-    description: description,
-    rating: 4.1,
-    isPopular: true,
-  ),
-  Product(
-    id: 3,
-    images: [
-      "assets/images/glap.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Gloves XC Omega - Polygon",
-    price: 36.55,
-    description: description,
-    rating: 4.1,
-    isFavourite: true,
-    isPopular: true,
-  ),
-  Product(
-    id: 4,
-    images: [
-      "assets/images/wireless headset.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
-    title: "Logitech Head",
-    price: 20.20,
-    description: description,
-    rating: 4.1,
-    isFavourite: true,
-  ),
-];
-
-const String description =
-    "Wireless Controller for PS4™ gives you what you want in your gaming from over precision control your games to sharing …";

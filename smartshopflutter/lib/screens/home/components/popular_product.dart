@@ -1,5 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import '../../../components/product_card.dart';
 import '../../../models/Product.dart';
 import '../../details/details_screen.dart';
@@ -22,36 +22,48 @@ class PopularProducts extends StatelessWidget {
             },
           ),
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              ...List.generate(
-                demoProducts.length,
-                (index) {
-                  if (demoProducts[index].isPopular) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: ProductCard(
-                        product: demoProducts[index],
-                        onPress: () => Navigator.pushNamed(
-                          context,
-                          DetailsScreen.routeName,
-                          arguments: ProductDetailsArguments(
-                              product: demoProducts[index]),
-                        ),
-                      ),
-                    );
-                  }
+        StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('products')
+              .where('isPopular', isEqualTo: true)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-                  return const SizedBox
-                      .shrink(); // here by default width and height is 0
-                },
+            final docs = snapshot.data?.docs ?? [];
+            if (docs.isEmpty) {
+              return const Center(child: Text("No popular products found."));
+            }
+
+            final popularProducts = docs.map((doc) {
+              final data = doc.data()! as Map<String, dynamic>;
+              // Use the factory you already defined in Product
+              return Product.fromFirestore(data, doc.id);
+            }).toList();
+
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  ...popularProducts.map((product) => Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: ProductCard(
+                          product: product,
+                          onPress: () => Navigator.pushNamed(
+                            context,
+                            DetailsScreen.routeName,
+                            arguments: ProductDetailsArguments(product: product),
+                          ),
+                        ),
+                      )),
+                  const SizedBox(width: 20),
+                ],
               ),
-              const SizedBox(width: 20),
-            ],
-          ),
-        )
+            );
+          },
+        ),
       ],
     );
   }

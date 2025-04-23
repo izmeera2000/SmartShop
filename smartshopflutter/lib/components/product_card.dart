@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import '../constants.dart';
 import '../models/Product.dart';
@@ -34,7 +35,20 @@ class ProductCard extends StatelessWidget {
                   color: kSecondaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Image.asset(product.images[0]),
+                child: FutureBuilder<String>(
+                  future: FirebaseStorage.instance
+                      .ref(product.images[0])
+                      .getDownloadURL(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError || !snapshot.hasData) {
+                      return const Center(child: Icon(Icons.broken_image));
+                    } else {
+                      return Image.network(snapshot.data!, fit: BoxFit.cover);
+                    }
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 8),

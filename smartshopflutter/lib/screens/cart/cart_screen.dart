@@ -1,13 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import '../../models/Cart.dart';
+import '../../models/Product.dart';
 import 'components/cart_card.dart';
 import 'components/check_out_card.dart';
 
 class CartScreen extends StatefulWidget {
   static String routeName = "/cart";
-
   const CartScreen({super.key});
 
   @override
@@ -15,55 +15,87 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  List<Cart> cartItems = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadCartFromFirestore("tflJCSWLG4TlXsoYxC5fcaHYF883"); // Replace with actual user ID
+  }
+
+  Future<void> loadCartFromFirestore(String userId) async {
+    final items = await fetchCartItemsFromFirestore(userId);
+    setState(() {
+      cartItems = items;
+      isLoading = false;
+    });
+  }
+
+  Future<void> removeCartItem(String userId, String productId) async {
+    final cartRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('cart');
+
+    final cartDocs = await cartRef.where('productId', isEqualTo: productId).get();
+    for (var doc in cartDocs.docs) {
+      await doc.reference.delete();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Column(
           children: [
-            const Text(
-              "Your Cart",
-              style: TextStyle(color: Colors.black),
-            ),
+            const Text("Your Cart", style: TextStyle(color: Colors.black)),
             Text(
-              "${demoCarts.length} items",
+              "${
+                isLoading ? 0 : cartItems.length
+              } items",
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: ListView.builder(
-          itemCount: demoCarts.length,
-          itemBuilder: (context, index) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Dismissible(
-              key: Key(demoCarts[index].product.id.toString()),
-              direction: DismissDirection.endToStart,
-              onDismissed: (direction) {
-                setState(() {
-                  demoCarts.removeAt(index);
-                });
-              },
-              background: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFE6E6),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  children: [
-                    const Spacer(),
-                    SvgPicture.asset("assets/icons/Trash.svg"),
-                  ],
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ListView.builder(
+                itemCount: cartItems.length,
+                itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Dismissible(
+                    key: Key(cartItems[index].product.id.toString()),
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (direction) {
+                      final productId = cartItems[index].product.id;
+                      setState(() {
+                        cartItems.removeAt(index);
+                      });
+                      removeCartItem("USER_ID", productId); // Replace user ID
+                    },
+                    background: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFE6E6),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        children: [
+                          const Spacer(),
+                          SvgPicture.asset("assets/icons/Trash.svg"),
+                        ],
+                      ),
+                    ),
+                    child: CartCard(cart: cartItems[index]),
+                  ),
                 ),
               ),
-              child: CartCard(cart: demoCarts[index]),
             ),
-          ),
-        ),
-      ),
       bottomNavigationBar: const CheckoutCard(),
     );
   }
