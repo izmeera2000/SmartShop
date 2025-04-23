@@ -7,6 +7,7 @@ import '../../../constants.dart';
 import '../../../helper/keyboard.dart';
 import '../../forgot_password/forgot_password_screen.dart';
 import '../../login_success/login_success_screen.dart';
+import 'package:smartshopflutter/components/save_details.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -146,6 +147,9 @@ class _SignFormState extends State<SignForm> {
                     password: password!,
                   );
 
+                  // Save user email after successful sign-in
+                  saveUserData(userCredential.user?.email ?? "No Email");
+
                   // Navigate to success screen or dashboard
                   Navigator.pushNamed(context, LoginSuccessScreen.routeName);
                 } on FirebaseAuthException catch (e) {
@@ -165,9 +169,10 @@ class _SignFormState extends State<SignForm> {
               }
             },
             child: const Text("Continue"),
-          ),
+          )
         ],
       ),
     );
   }
 }
+

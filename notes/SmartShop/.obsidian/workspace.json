@@ -11,14 +11,17 @@
             "id": "048ef9f40cce22dc",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "canvas",
               "state": {
-                "file": "Design/Categories.md",
-                "mode": "source",
-                "source": false
+                "file": "Design/Nav Bar.canvas",
+                "viewState": {
+                  "x": 45,
+                  "y": 130,
+                  "zoom": 0
+                }
               },
-              "icon": "lucide-file",
-              "title": "Categories"
+              "icon": "lucide-layout-dashboard",
+              "title": "Nav Bar"
             }
           }
         ]
