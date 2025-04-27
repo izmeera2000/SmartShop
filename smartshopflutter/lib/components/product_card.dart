@@ -24,76 +24,78 @@ class ProductCard extends StatelessWidget {
       width: width,
       child: GestureDetector(
         onTap: onPress,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AspectRatio(
-              aspectRatio: 1.02,
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: kSecondaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: FutureBuilder<String>(
-                  future: FirebaseStorage.instance
-                      .ref(product.images[0])
-                      .getDownloadURL(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError || !snapshot.hasData) {
-                      return const Center(child: Icon(Icons.broken_image));
-                    } else {
-                      return Image.network(snapshot.data!, fit: BoxFit.cover);
-                    }
-                  },
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AspectRatio(
+                aspectRatio: 1.02,
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: kSecondaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: FutureBuilder<String>(
+                    future: FirebaseStorage.instance
+                        .ref(product.images[0])
+                        .getDownloadURL(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError || !snapshot.hasData) {
+                        return const Center(child: Icon(Icons.broken_image));
+                      } else {
+                        return Image.network(snapshot.data!, fit: BoxFit.cover);
+                      }
+                    },
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              product.title,
-              style: Theme.of(context).textTheme.bodyMedium,
-              maxLines: 2,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "\$${product.price}",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: kPrimaryColor,
-                  ),
-                ),
-                InkWell(
-                  borderRadius: BorderRadius.circular(50),
-                  onTap: () {},
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    height: 24,
-                    width: 24,
-                    decoration: BoxDecoration(
-                      color: product.isFavourite
-                          ? kPrimaryColor.withOpacity(0.15)
-                          : kSecondaryColor.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: SvgPicture.asset(
-                      "assets/icons/Heart Icon_2.svg",
-                      colorFilter: ColorFilter.mode(
-                          product.isFavourite
-                              ? const Color(0xFFFF4848)
-                              : const Color(0xFFDBDEE4),
-                          BlendMode.srcIn),
+              const SizedBox(height: 8),
+              Text(
+                product.title,
+                style: Theme.of(context).textTheme.bodyMedium,
+                maxLines: 2,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "\$${product.price}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: kPrimaryColor,
                     ),
                   ),
-                ),
-              ],
-            )
-          ],
+                  InkWell(
+                    borderRadius: BorderRadius.circular(50),
+                    onTap: () {},
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      height: 24,
+                      width: 24,
+                      decoration: BoxDecoration(
+                        color: product.isFavourite
+                            ? kPrimaryColor.withOpacity(0.15)
+                            : kSecondaryColor.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: SvgPicture.asset(
+                        "assets/icons/Heart Icon_2.svg",
+                        colorFilter: ColorFilter.mode(
+                            product.isFavourite
+                                ? const Color(0xFFFF4848)
+                                : const Color(0xFFDBDEE4),
+                            BlendMode.srcIn),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

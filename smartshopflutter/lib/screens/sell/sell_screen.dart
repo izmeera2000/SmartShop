@@ -1,0 +1,169 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
+import 'package:smartshopflutter/models/Product.dart';
+import 'package:smartshopflutter/components/product_card.dart';
+ import '../details/details_screen.dart';
+
+
+
+class SellScreen extends StatefulWidget {
+  static const String routeName = "/products";
+  const SellScreen({super.key});
+
+  @override
+  _SellScreenState createState() => _SellScreenState();
+}
+
+class _SellScreenState extends State<SellScreen> {
+  File? _image;
+  final picker = ImagePicker();
+
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _priceController = TextEditingController();
+
+  Future<List<Product>> fetchProducts() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('products')
+        .get();
+    return snapshot.docs
+        .map((doc) => Product.fromFirestore(doc.data(), doc.id))
+        .toList();
+  }
+
+  Future<void> uploadProduct() async {
+    if (_image == null || _titleController.text.isEmpty || _descriptionController.text.isEmpty || _priceController.text.isEmpty) {
+      print("All fields are required!");
+      return;
+    }
+
+    try {
+      // Upload image to Firebase Storage
+      final storageRef = FirebaseStorage.instance.ref().child('product_images/${DateTime.now().millisecondsSinceEpoch}');
+      final uploadTask = storageRef.putFile(_image!);
+      final snapshot = await uploadTask;
+      final imageUrl = await snapshot.ref.getDownloadURL();
+
+      // Add product data to Firestore
+      final productData = {
+        'title': _titleController.text,
+        'description': _descriptionController.text,
+        'price': double.tryParse(_priceController.text) ?? 0.0,
+        'image': imageUrl,
+      };
+
+      await FirebaseFirestore.instance.collection('products').add(productData);
+
+      print("Product uploaded successfully!");
+
+      // Clear form fields
+      _titleController.clear();
+      _descriptionController.clear();
+      _priceController.clear();
+      setState(() {
+        _image = null;
+      });
+    } catch (e) {
+      print("Error uploading product: $e");
+    }
+  }
+
+Future<void> pickImage() async {
+  // Use ImagePicker's updated method: pickImage
+  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  
+  if (pickedFile != null) {
+    setState(() {
+      _image = File(pickedFile.path);  // Update the selected image file
+    });
+  }
+}
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Upload Product")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(labelText: "Product Title"),
+            ),
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(labelText: "Product Description"),
+            ),
+            TextField(
+              controller: _priceController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: "Product Price"),
+            ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: pickImage,
+              child: Container(
+                height: 200,
+                color: Colors.grey[200],
+                child: _image == null
+                    ? const Center(child: Text("Tap to pick an image"))
+                    : Image.file(_image!, fit: BoxFit.cover),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: uploadProduct,
+              child: const Text("Upload Product"),
+            ),
+            const SizedBox(height: 20),
+            const Text("Existing Products"),
+            FutureBuilder<List<Product>>(
+              future: fetchProducts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                }
+                final products = snapshot.data;
+                if (products == null || products.isEmpty) {
+                  return const Center(child: Text("No products available"));
+                }
+
+                return GridView.builder(
+                  shrinkWrap: true,
+                  itemCount: products.length,
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 200,
+                    childAspectRatio: 0.7,
+                    mainAxisSpacing: 20,
+                    crossAxisSpacing: 16,
+                  ),
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return ProductCard(
+                      product: product,
+                      onPress: () {
+                        Navigator.pushNamed(
+                          context,
+                          DetailsScreen.routeName,
+                          arguments: ProductDetailsArguments(product: product),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

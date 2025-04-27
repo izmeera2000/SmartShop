@@ -70,17 +70,17 @@ class ProductDescription extends StatelessWidget {
             onTap: () {},
             child: const Row(
               children: [
-                Text(
-                  "See More Detail",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600, color: kPrimaryColor),
-                ),
-                SizedBox(width: 5),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 12,
-                  color: kPrimaryColor,
-                ),
+                // Text(
+                //   "See More Detail",
+                //   style: TextStyle(
+                //       fontWeight: FontWeight.w600, color: kPrimaryColor),
+                // ),
+                // SizedBox(width: 5),
+                // Icon(
+                //   Icons.arrow_forward_ios,
+                //   size: 12,
+                //   color: kPrimaryColor,
+                // ),
               ],
             ),
           ),

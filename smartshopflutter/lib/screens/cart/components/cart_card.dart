@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:firebase_storage/firebase_storage.dart'; // Add this if not already imported
 import '../../../constants.dart';
 import '../../../models/Cart.dart';
 
@@ -11,12 +11,17 @@ class CartCard extends StatelessWidget {
 
   final Cart cart;
 
+  Future<String> getImageUrl(String path) async {
+    final storageRef = FirebaseStorage.instance.ref(path);
+    return await storageRef.getDownloadURL();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         SizedBox(
-          width: 88,
+          width: 70,
           child: AspectRatio(
             aspectRatio: 0.88,
             child: Container(
@@ -25,7 +30,18 @@ class CartCard extends StatelessWidget {
                 color: const Color(0xFFF5F6F9),
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: Image.asset(cart.product.images[0]),
+              child: FutureBuilder<String>(
+                future: getImageUrl(cart.product.images[0]),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                  } else if (snapshot.hasError || !snapshot.hasData) {
+                    return const Icon(Icons.broken_image, size: 50);
+                  } else {
+                    return Image.network(snapshot.data!, fit: BoxFit.cover);
+                  }
+                },
+              ),
             ),
           ),
         ),
@@ -41,7 +57,7 @@ class CartCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text.rich(
               TextSpan(
-                text: "\$${cart.product.price}",
+                text: "\RM${cart.product.price}",
                 style: const TextStyle(
                     fontWeight: FontWeight.w600, color: kPrimaryColor),
                 children: [

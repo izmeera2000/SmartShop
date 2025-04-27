@@ -8,41 +8,44 @@ class ColorDots extends StatelessWidget {
   const ColorDots({
     Key? key,
     required this.product,
+    required this.quantity,
+    required this.incrementQuantity,
+    required this.decrementQuantity,
   }) : super(key: key);
 
   final Product product;
+  final int quantity;
+  final VoidCallback incrementQuantity;
+  final VoidCallback decrementQuantity;
 
   @override
   Widget build(BuildContext context) {
-    // Now this is fixed and only for demo
-    int selectedColor = 3;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          ...List.generate(
-            product.colors.length,
-            (index) => ColorDot(
-              color: product.colors[index],
-              isSelected: index == selectedColor,
-            ),
-          ),
           const Spacer(),
           RoundedIconBtn(
             icon: Icons.remove,
-            press: () {},
+            press: decrementQuantity,
+          ),
+          const SizedBox(width: 20),
+          Text(
+            '$quantity',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(width: 20),
           RoundedIconBtn(
             icon: Icons.add,
             showShadow: true,
-            press: () {},
+            press: incrementQuantity,
           ),
         ],
       ),
     );
   }
 }
+
 
 class ColorDot extends StatelessWidget {
   const ColorDot({

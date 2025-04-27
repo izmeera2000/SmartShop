@@ -6,7 +6,7 @@ class Product {
   final String title;
   final String description;
   final List<String> images;
-  final List<Color> colors;
+  // final List<Color> colors;
   final double rating;
   final double price;
   final bool isFavourite;
@@ -17,7 +17,7 @@ class Product {
     required this.title,
     required this.description,
     required this.images,
-    required this.colors,
+    // required this.colors,
     required this.rating,
     required this.price,
     required this.isFavourite,
@@ -43,16 +43,16 @@ class Product {
   // Factory method to create Product from Firestore document
   factory Product.fromFirestore(Map<String, dynamic> data, String docId) {
     // Safely convert colors from Firestore to List<Color>
-    List<Color> colors = (data['colors'] as List<dynamic>)
-        .map((hex) => hexToColor(hex.toString())) // Convert hex to Color
-        .toList();
+    // List<Color> colors = (data['colors'] as List<dynamic>)
+    //     .map((hex) => hexToColor(hex.toString())) // Convert hex to Color
+    //     .toList();
 
     return Product(
       id: docId,
       title: data['title'] ?? 'Untitled', // Default title if not found
       description: data['description'] ?? 'No description available',
       images: List<String>.from(data['images'] ?? []), // Default empty list if no images
-      colors: colors,
+      // colors: colors,
       rating: (data['rating'] as num?)?.toDouble() ?? 0.0, // Default rating if null
       price: (data['price'] as num?)?.toDouble() ?? 0.0,  // Default price if null
       isFavourite: data['isFavourite'] ?? false, // Default false if not found

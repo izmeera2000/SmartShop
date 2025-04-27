@@ -41,9 +41,9 @@ class FavoriteScreen extends StatelessWidget {
                       title: data['title'],
                       description: data['description'],
                       images: List<String>.from(data['images']),
-                      colors: (data['colors'] as List)
-                          .map((hex) => Color(int.parse(hex)))
-                          .toList(),
+                      // colors: (data['colors'] as List)
+                      //     .map((hex) => Color(int.parse(hex)))
+                      //     .toList(),
                       rating: (data['rating'] as num).toDouble(),
                       price: (data['price'] as num).toDouble(),
                       isFavourite: data['isFavourite'],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import '../../../constants.dart';
 import '../../../models/Product.dart';
@@ -18,6 +20,13 @@ class ProductImages extends StatefulWidget {
 class _ProductImagesState extends State<ProductImages> {
   int selectedImage = 0;
 
+  Future<String> getImageUrl(String path) async {
+    // Get the Firebase Storage reference for the image
+    final storageRef = FirebaseStorage.instance.ref(path);
+    // Get the download URL
+    return await storageRef.getDownloadURL();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -26,14 +35,16 @@ class _ProductImagesState extends State<ProductImages> {
           width: 238,
           child: AspectRatio(
             aspectRatio: 1,
-            child: Image.network(
-              widget.product.images[selectedImage],
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image, size: 60),
-              loadingBuilder: (context, child, progress) {
-                if (progress == null) return child;
-                return const Center(child: CircularProgressIndicator());
+            child: FutureBuilder<String>(
+              future: getImageUrl(widget.product.images[selectedImage]),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError || !snapshot.hasData) {
+                  return const Center(child: Icon(Icons.broken_image, size: 60));
+                } else {
+                  return Image.network(snapshot.data!, fit: BoxFit.cover);
+                }
               },
             ),
           ),
@@ -71,6 +82,11 @@ class SmallProductImage extends StatelessWidget {
   final VoidCallback press;
   final String imageUrl;
 
+  Future<String> getImageUrl(String path) async {
+    final storageRef = FirebaseStorage.instance.ref(path);
+    return await storageRef.getDownloadURL();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -88,14 +104,16 @@ class SmallProductImage extends StatelessWidget {
             color: kPrimaryColor.withOpacity(isSelected ? 1 : 0),
           ),
         ),
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) =>
-              const Icon(Icons.broken_image, size: 24),
-          loadingBuilder: (context, child, progress) {
-            if (progress == null) return child;
-            return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+        child: FutureBuilder<String>(
+          future: getImageUrl(imageUrl),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+            } else if (snapshot.hasError || !snapshot.hasData) {
+              return const Icon(Icons.broken_image, size: 24);
+            } else {
+              return Image.network(snapshot.data!, fit: BoxFit.cover);
+            }
           },
         ),
       ),

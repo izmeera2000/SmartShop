@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -141,17 +142,37 @@ class _SignFormState extends State<SignForm> {
                 KeyboardUtil.hideKeyboard(context);
 
                 try {
+                  // Sign in the user
                   final UserCredential userCredential =
                       await _auth.signInWithEmailAndPassword(
                     email: email!,
                     password: password!,
                   );
 
-                  // Save user email after successful sign-in
-                  saveUserData(userCredential.user?.email ?? "No Email");
+                  final user = userCredential.user;
 
-                  // Navigate to success screen or dashboard
-                  Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+                  if (user != null) {
+                    // Save user data to Firestore
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.uid)
+                        .set({
+                      'email': user.email,
+                      'uid': user.uid,
+                      'lastLogin': FieldValue.serverTimestamp(),
+                    }, SetOptions(merge: true));
+
+                    print('✅ User data saved to Firestore: ${user.uid}');
+
+                    // Save to SharedPreferences
+                    await saveUserData(
+                        email: user.email ?? "No Email", uid: user.uid);
+
+                    print('✅ User data saved locally: ${user.uid}');
+
+                    // Navigate to success screen
+                    Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+                  }
                 } on FirebaseAuthException catch (e) {
                   String errorMessage;
                   if (e.code == 'user-not-found') {
@@ -169,10 +190,9 @@ class _SignFormState extends State<SignForm> {
               }
             },
             child: const Text("Continue"),
-          )
+          ),
         ],
       ),
     );
   }
 }
-
