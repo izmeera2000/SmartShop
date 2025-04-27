@@ -4,7 +4,7 @@ import 'package:smartshopflutter/constants.dart';
 import 'package:smartshopflutter/screens/favorite/favorite_screen.dart';
 import 'package:smartshopflutter/screens/home/home_screen.dart';
 import 'package:smartshopflutter/screens/profile/profile_screen.dart';
-import 'package:smartshopflutter/screens/sell/sell_screen.dart';
+import 'package:smartshopflutter/screens/sell/sell_lists_screen.dart';
 
 const Color inActiveIconColor = Color(0xFFB6B6B6);
 
@@ -28,7 +28,7 @@ class _InitScreenState extends State<InitScreen> {
 
   final pages = [
     const HomeScreen(),
-    const SellScreen(),
+    const SellListScreen(),
     const Center(
       child: Text("Chat"),
     ),
