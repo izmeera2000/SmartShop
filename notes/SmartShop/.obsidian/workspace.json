@@ -28,12 +28,14 @@
             "id": "f12e20506a921532",
             "type": "leaf",
             "state": {
-              "type": "release-notes",
+              "type": "markdown",
               "state": {
-                "currentVersion": "1.8.10"
+                "file": "Flowish.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-book-up",
-              "title": "Release Notes 1.8.10"
+              "icon": "lucide-file",
+              "title": "Flowish"
             }
           }
         ],
@@ -186,7 +188,9 @@
   },
   "active": "f12e20506a921532",
   "lastOpenFiles": [
+    "Untitled.md",
     "Flowish.md",
+    "Generate SHA-1.md",
     "Design/Categories.md",
     "Roles.md",
     "Design/Nav Bar.canvas",
