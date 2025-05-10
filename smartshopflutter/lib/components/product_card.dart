@@ -62,11 +62,11 @@ class ProductCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "\$${product.price}",
+                    "\RM${product.price}",
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: kPrimaryColor,
+                      color: Color.fromARGB(255, 0, 0, 0),
                     ),
                   ),
                   InkWell(
@@ -86,7 +86,7 @@ class ProductCard extends StatelessWidget {
                         "assets/icons/Heart Icon_2.svg",
                         colorFilter: ColorFilter.mode(
                             product.isFavourite
-                                ? const Color(0xFFFF4848)
+                                ? const Color.fromARGB(255, 255, 0, 0)
                                 : const Color(0xFFDBDEE4),
                             BlendMode.srcIn),
                       ),
