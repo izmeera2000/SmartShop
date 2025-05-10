@@ -37,9 +37,26 @@
               "icon": "lucide-file",
               "title": "Flowish"
             }
+          },
+          {
+            "id": "2654ff56d00e0a55",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "Design/Nav Bar.canvas",
+                "viewState": {
+                  "x": 45,
+                  "y": 130,
+                  "zoom": 0
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "Nav Bar"
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -186,15 +203,18 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "f12e20506a921532",
+  "active": "2654ff56d00e0a55",
   "lastOpenFiles": [
-    "Untitled.md",
-    "Flowish.md",
+    "Design/Flow.canvas",
     "Generate SHA-1.md",
-    "Design/Categories.md",
-    "Roles.md",
+    "Flowish.md",
+    "things left todo.md",
     "Design/Nav Bar.canvas",
+    "Untitled.md",
+    "Untitled 1.md",
     "Welcome.md",
+    "Roles.md",
+    "Design/Categories.md",
     "Design"
   ]
 }
