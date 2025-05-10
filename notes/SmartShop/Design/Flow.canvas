@@ -1,0 +1,15 @@
+{
+	"nodes":[
+		{"id":"884a5531b06fb3ff","x":-340,"y":-260,"width":250,"height":60,"type":"text","text":"User"},
+		{"id":"2689c9f6cee0bf56","x":-340,"y":-80,"width":250,"height":60,"type":"text","text":"Product"},
+		{"id":"95332909a2a05091","x":-590,"y":80,"width":250,"height":60,"type":"text","text":"Sell"},
+		{"id":"4fd6c92e15d190b5","x":-140,"y":80,"width":250,"height":60,"type":"text","text":"Buy\n"},
+		{"id":"6b1d550c29435f9d","x":-590,"y":220,"width":250,"height":60,"type":"text","text":"Product Details\nStock\n"}
+	],
+	"edges":[
+		{"id":"8060f4baa4c390b3","fromNode":"884a5531b06fb3ff","fromSide":"bottom","toNode":"2689c9f6cee0bf56","toSide":"top"},
+		{"id":"e6e88ee14b4d7a92","fromNode":"2689c9f6cee0bf56","fromSide":"bottom","toNode":"95332909a2a05091","toSide":"top"},
+		{"id":"e70d291077dd235f","fromNode":"2689c9f6cee0bf56","fromSide":"bottom","toNode":"4fd6c92e15d190b5","toSide":"top"},
+		{"id":"9e70769ba0ce1bd3","fromNode":"95332909a2a05091","fromSide":"bottom","toNode":"6b1d550c29435f9d","toSide":"top"}
+	]
+}
