@@ -63,7 +63,7 @@ class _SellScreenState extends State<SellScreen> {
         'price': double.tryParse(_priceController.text) ?? 0.0,
         'stock':
             int.tryParse(_stockController.text) ?? 0, // ✅ Save stock as int
-        'popular': _isPopular, // ✅ Save popular as bool
+        'isPopular': _isPopular, // ✅ Save popular as bool
         'images': imagePaths,
         'userId': userId,
       };
