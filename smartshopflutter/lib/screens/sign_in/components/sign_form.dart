@@ -114,7 +114,7 @@ class _SignFormState extends State<SignForm> {
             children: [
               Checkbox(
                 value: remember,
-                activeColor: kPrimaryColor,
+                activeColor: const Color.fromARGB(255, 255, 0, 0),
                 onChanged: (value) {
                   setState(() {
                     remember = value;
@@ -128,7 +128,7 @@ class _SignFormState extends State<SignForm> {
                     context, ForgotPasswordScreen.routeName),
                 child: const Text(
                   "Forgot Password",
-                  style: TextStyle(decoration: TextDecoration.underline),
+                  style: TextStyle()
                 ),
               )
             ],

@@ -1,0 +1,2 @@
+C:/Users/Lenovo/Desktop/pt4/SmartShop/smartshopflutter/android/app/.cxx/Debug/1d2a5k60/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Lenovo/Desktop/pt4/SmartShop/smartshopflutter/android/app/.cxx/Debug/1d2a5k60/x86_64/CMakeFiles/rebuild_cache.dir

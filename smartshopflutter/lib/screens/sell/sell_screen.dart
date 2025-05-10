@@ -104,26 +104,26 @@ class _SellScreenState extends State<SellScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text("Upload Product")),
       body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 30),
         child: SingleChildScrollView(
           child: Column(
             children: [
               Column(
                 children: [
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
                   const Text("Add Product", style: headingStyle),
                   const Text(
                     "Complete your details of the product  \nwith social media",
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
                   GestureDetector(
                     onTap: pickImage,
                     child: Container(
                       height: 200,
-                      color: Colors.grey[200],
+                      color: const Color.fromARGB(255, 238, 238, 238),
                       child: _image == null
-                          ? const Center(child: Text("Tap to pick images"))
+                          ? const Center(child: Text("Tap to pick image"))
                           : GridView.builder(
                               itemCount: _image!.length,
                               gridDelegate:

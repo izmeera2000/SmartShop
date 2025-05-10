@@ -23,8 +23,8 @@ class _SplashContentState extends State<SplashContent> {
         const Text(
           "SMART SHOP",
           style: TextStyle(
-            fontSize: 32,
-            color: kPrimaryColor,
+            fontSize: 35,
+            color: Color.fromARGB(255, 255, 0, 0),
             fontWeight: FontWeight.bold,
           ),
         ),
