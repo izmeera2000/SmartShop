@@ -16,13 +16,14 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen> {
   void initState() {
     super.initState();
     // Wait 2 seconds then navigate automatically
+ 
     Timer(const Duration(seconds: 2), () {
 Navigator.pushNamedAndRemoveUntil(
   context,
   InitScreen.routeName,
   (Route<dynamic> route) => false,
 );
-    });
+     });
   }
 
   @override
@@ -37,9 +38,9 @@ Navigator.pushNamedAndRemoveUntil(
           ),
           const SizedBox(height: 16),
           const Text(
-            "Login Success",
+            "LOGIN SUCCESS",
             style: TextStyle(
-              fontSize: 30,
+              fontSize: 25,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
