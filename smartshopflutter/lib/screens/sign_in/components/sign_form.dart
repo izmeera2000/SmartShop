@@ -171,7 +171,11 @@ class _SignFormState extends State<SignForm> {
                     print('✅ User data saved locally: ${user.uid}');
 
                     // Navigate to success screen
-                    Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      LoginSuccessScreen.routeName,
+                      (Route<dynamic> route) => false,
+                    );
                   }
                 } on FirebaseAuthException catch (e) {
                   String errorMessage;
