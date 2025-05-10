@@ -17,7 +17,7 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen> {
     super.initState();
     // Wait 2 seconds then navigate automatically
  
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 1), () {
 Navigator.pushNamedAndRemoveUntil(
   context,
   InitScreen.routeName,
