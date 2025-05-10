@@ -42,17 +42,14 @@
             "id": "2654ff56d00e0a55",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "markdown",
               "state": {
-                "file": "Design/Nav Bar.canvas",
-                "viewState": {
-                  "x": 45,
-                  "y": 130,
-                  "zoom": 0
-                }
+                "file": "Roles.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "Nav Bar"
+              "icon": "lucide-file",
+              "title": "Roles"
             }
           }
         ],
@@ -205,12 +202,12 @@
   },
   "active": "2654ff56d00e0a55",
   "lastOpenFiles": [
-    "Design/Flow.canvas",
-    "Generate SHA-1.md",
-    "Flowish.md",
     "things left todo.md",
+    "Generate SHA-1.md",
     "Design/Nav Bar.canvas",
     "Untitled.md",
+    "Design/Flow.canvas",
+    "Flowish.md",
     "Untitled 1.md",
     "Welcome.md",
     "Roles.md",
