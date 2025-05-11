@@ -17,7 +17,7 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen> {
     super.initState();
     // Wait 2 seconds then navigate automatically
  
-    Timer(const Duration(seconds: 1), () {
+    Timer(const Duration(seconds: 2), () {
 Navigator.pushNamedAndRemoveUntil(
   context,
   InitScreen.routeName,
@@ -36,7 +36,7 @@ Navigator.pushNamedAndRemoveUntil(
             "assets/images/success.png",
             height: MediaQuery.of(context).size.height * 0.4,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           const Text(
             "LOGIN SUCCESS",
             style: TextStyle(
