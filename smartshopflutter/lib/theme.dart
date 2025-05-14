@@ -28,7 +28,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+          backgroundColor: kPrimaryColor,
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 48),
           shape: const RoundedRectangleBorder(
@@ -36,6 +36,30 @@ class AppTheme {
           ),
         ),
       ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor:
+            Colors.white, // Set the background color of the nav bar
+        // selectedItemColor: Colors.white, // Color for the selected item
+        // unselectedItemColor: Colors.white60, // Color for the unselected items
+        elevation: 5, // Add elevation for a subtle shadow
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: kPrimaryColor, // Set FAB background color
+        foregroundColor: Colors.white, // Set icon color inside FAB
+        elevation: 6, // Add elevation for a shadow effect
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12), // Rounded corners
+        ), // FAB with rounded edges (Stadium shape)
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: kPrimaryColor, // Change the color globally
+        circularTrackColor:
+            Colors.grey[200], // Background track color (optional)
+      ),
+          switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.all(kPrimaryColor),
+      trackColor: WidgetStateProperty.all(kPrimaryLightColor),
+    ),
     );
   }
 }

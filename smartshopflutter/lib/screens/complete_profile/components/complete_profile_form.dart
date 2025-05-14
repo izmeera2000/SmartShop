@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -142,24 +143,53 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                 try {
                   final user = FirebaseAuth.instance.currentUser;
                   if (user != null) {
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(user.uid)
-                        .set({
-                      'firstName': firstName,
-                      'lastName': lastName,
-                      'phoneNumber': phoneNumber,
-                      'address': address,
-                      'email': user.email,
-                      'uid': user.uid,
-                      'createdAt': FieldValue.serverTimestamp(),
-                    });
+                    // Get FCM token after login or profile update
+                    String? token = await FirebaseMessaging.instance.getToken();
+                    print("FCM Token: $token");
 
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      "/sign_in", // using the string route name directly
-                      (route) => false,
-                    );
+                    if (token != null) {
+                      // Fetch existing FCM tokens from Firestore
+                      DocumentSnapshot userDoc = await FirebaseFirestore
+                          .instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .get();
+
+                      // Add the new token to the user's token list (if it's not already there)
+                      Map<String, dynamic> userData =
+                          userDoc.data() as Map<String, dynamic>;
+
+// Initialize the fcmTokens field if it doesn't exist
+                      List<String> fcmTokens =
+                          List.from(userData['fcmTokens'] ?? []);
+
+                      // Add the new token to the list (if it's not already present)
+                      if (!fcmTokens.contains(token)) {
+                        fcmTokens.add(
+                            token); // Add the token if it's not already in the list
+                      }
+
+                      // Save the user information along with updated FCM tokens to Firestore
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .set({
+                        'firstName': firstName,
+                        'lastName': lastName,
+                        'phoneNumber': phoneNumber,
+                        'address': address,
+                        'email': user.email,
+                        'uid': user.uid,
+                        'createdAt': FieldValue.serverTimestamp(),
+                        'fcmTokens': fcmTokens, // Save the list of FCM tokens
+                      });
+
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        "/sign_in", // Navigate to sign-in screen
+                        (route) => false,
+                      );
+                    }
                   } else {
                     // Handle not logged in
                     ScaffoldMessenger.of(context).showSnackBar(

@@ -1,8 +1,7 @@
 plugins {
  
 
-    // 👇 Add this line
-    id 'com.google.gms.google-services' version '4.3.15' apply false
+     id 'com.google.gms.google-services' version '4.3.15' apply false
 }
 
 

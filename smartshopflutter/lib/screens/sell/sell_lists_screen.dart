@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:smartshopflutter/components/save_details.dart';
 import 'package:smartshopflutter/models/Product.dart';
 import 'package:smartshopflutter/components/product_card.dart';
+import 'package:smartshopflutter/screens/sell/sell_edit_screen.dart';
 import 'package:smartshopflutter/screens/sell/sell_screen.dart'; // Import the upload screen
 
 class SellListScreen extends StatelessWidget {
   static const String routeName = "/sell_list";
-  const SellListScreen({Key? key}) : super(key: key); // ✅ make constructor const
-  
+  const SellListScreen({Key? key})
+      : super(key: key); // ✅ make constructor const
 
   Future<List<Product>> fetchProducts() async {
-      String? userId = await getUserID();
-    
+    String? userId = await getUserID();
+
     final snapshot = await FirebaseFirestore.instance
         .collection('products')
         .where('userId', isEqualTo: userId) // 🔥 filter by userId
@@ -53,12 +54,15 @@ class SellListScreen extends StatelessWidget {
               ),
               itemBuilder: (context, index) {
                 final product = products[index];
+                // print(product.images[0]);
                 return ProductCard(
                   product: product,
                   onPress: () {
-                    // Navigate to product details screen
-                    // (You can modify this if you have a product details page)
-                    print('Product clicked: ${product.title}');
+                    Navigator.pushNamed(
+                      context,
+                      SellEditScreen.routeName,
+                      arguments: product,
+                    );
                   },
                 );
               },

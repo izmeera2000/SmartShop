@@ -48,6 +48,7 @@ Future<List<Cart>> fetchCartItemsFromFirestore(String userId) async {
         } else if (cartData['images'] != null) {
           images = [cartData['images'].toString()];
         }
+final stock = (cartData['stock'] as num?)?.toInt() ?? 0; // ✅ Default to 0 if null
 
         final rating = (cartData['rating'] as num?)?.toDouble() ?? 0.0; // Default to 0.0 if null
         final price = (cartData['price'] as num?)?.toDouble() ?? 0.00;  // Default to 0.0 if null
@@ -55,17 +56,18 @@ Future<List<Cart>> fetchCartItemsFromFirestore(String userId) async {
         final isPopular = cartData['isPopular'] ?? false;   // Default to false if null
 
         // Create a Product object directly from the cart data
-        final product = Product(
-          id: productId,
-          title: title,
-          description: description,
-          images: images,
-          rating: rating,
-          price: price,
-          isFavourite: isFavourite,
-          isPopular: isPopular,
-          userId: cartData['userId'] ?? '', // Add the userId if needed for filtering
-        );
+    final product = Product(
+  id: productId,
+  title: title,
+  description: description,
+  images: images,
+  rating: rating,
+  price: price,
+  isFavourite: isFavourite,
+  isPopular: isPopular,
+  userId: cartData['userId'] ?? '', // User ID
+  stock: stock, // ✅ Add this line
+);
 
         // Add the cart item to the cartItems list
         cartItems.add(Cart(product: product, numOfItem: numOfItem));
