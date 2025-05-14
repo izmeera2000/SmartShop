@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:smartshopflutter/screens/payment/payment_screen.dart';
 import 'package:smartshopflutter/screens/products/products_screen.dart';
 
 import 'screens/cart/cart_screen.dart';
@@ -15,6 +16,7 @@ import 'screens/sign_up/sign_up_screen.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/sell/sell_screen.dart';
 import 'screens/sell/sell_lists_screen.dart';
+import 'screens/checkout/checkout_screen.dart';
 
 // We use name route
 // All our routes will be available here
@@ -31,6 +33,8 @@ final Map<String, WidgetBuilder> routes = {
   ProductsScreen.routeName: (context) => const ProductsScreen(),
   DetailsScreen.routeName: (context) => const DetailsScreen(),
   CartScreen.routeName: (context) => const CartScreen(),
+  CheckoutScreen.routeName: (context) => const CheckoutScreen(),
+  PaymentScreen.routeName: (context) => const PaymentScreen(),
   ProfileScreen.routeName: (context) => const ProfileScreen(),
   SellScreen.routeName: (context) => const SellScreen(),
   SellListScreen.routeName: (context) => const SellListScreen(),

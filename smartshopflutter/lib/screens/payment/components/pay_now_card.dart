@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:smartshopflutter/screens/checkout/checkout_screen.dart';
+import 'package:smartshopflutter/screens/init_screen.dart';
 
-import '../../../constants.dart';
+import '../../../../constants.dart';
 
-class CheckoutCard extends StatelessWidget {
+class PaidCard extends StatelessWidget {
   final double totalPrice;
   final int totalQuantity;
 
-  const CheckoutCard({
+  const PaidCard({
     Key? key,
     required this.totalPrice,
     required this.totalQuantity,
@@ -63,29 +63,31 @@ class CheckoutCard extends StatelessWidget {
             //   ],
             // ),
             const SizedBox(height: 16),
+
             Row(
               children: [
-                Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      text: "Total:\n",
-                      children: [
-                        TextSpan(
-                          text:
-                              "\RM${totalPrice.toStringAsFixed(2)}", // Display total price
-                          style: const TextStyle(
-                              fontSize: 16, color: Colors.black),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // Expanded(
+                //   child: Text.rich(
+                //     TextSpan(
+                //       text: "Total:\n",
+                //       children: [
+                //         TextSpan(
+                //           text:
+                //               "\RM${totalPrice.toStringAsFixed(2)}", // Display total price
+                //           style: const TextStyle(
+                //               fontSize: 16, color: Colors.black),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, CheckoutScreen.routeName);
+                                               Navigator.pushNamed(context, InitScreen.routeName);
+
                     },
-                    child: const Text("Check Out"),
+                    child: const Text("Done"),
                   ),
                 ),
               ],

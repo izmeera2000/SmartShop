@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth for user ID
+
 import '../../../components/product_card.dart';
 import '../../../models/Product.dart';
 import '../../details/details_screen.dart';
@@ -11,6 +13,9 @@ class PopularProducts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get current user's ID
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+
     return Column(
       children: [
         Padding(
@@ -25,7 +30,7 @@ class PopularProducts extends StatelessWidget {
         StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('products')
-              .where('isPopular', isEqualTo: true)
+              .where('isPopular', isEqualTo: true) // Fetch all popular products
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -37,27 +42,35 @@ class PopularProducts extends StatelessWidget {
               return const Center(child: Text("No popular products found."));
             }
 
+            // Filter the products to exclude those that belong to the current user
             final popularProducts = docs.map((doc) {
               final data = doc.data()! as Map<String, dynamic>;
-              // Use the factory you already defined in Product
               return Product.fromFirestore(data, doc.id);
+            }).toList();
+
+            // Filter out products that belong to the current user
+            final filteredProducts = popularProducts.where((product) {
+              return product.userId != userId;  // Exclude the current user's products
             }).toList();
 
             return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  ...popularProducts.map((product) => Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: ProductCard(
-                          product: product,
-                          onPress: () => Navigator.pushNamed(
-                            context,
-                            DetailsScreen.routeName,
-                            arguments: ProductDetailsArguments(product: product),
+                  if (filteredProducts.isEmpty) 
+                    const Center(child: Text("No popular products available"))
+                  else
+                    ...filteredProducts.map((product) => Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: ProductCard(
+                            product: product,
+                            onPress: () => Navigator.pushNamed(
+                              context,
+                              DetailsScreen.routeName,
+                              arguments: ProductDetailsArguments(product: product),
+                            ),
                           ),
-                        ),
-                      )),
+                        )),
                   const SizedBox(width: 20),
                 ],
               ),

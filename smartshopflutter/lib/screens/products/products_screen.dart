@@ -3,21 +3,32 @@ import 'package:flutter/material.dart';
 import 'package:smartshopflutter/components/product_card.dart';
 import 'package:smartshopflutter/models/Product.dart';
 import '../details/details_screen.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProductsScreen extends StatelessWidget {
   static const String routeName = "/products";
   const ProductsScreen({super.key});
 
+  // Fetch products but exclude the ones belonging to the current user
   Future<List<Product>> fetchProducts() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('products')
-        .get();
+    try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        // If there's no user logged in, return an empty list
+        return [];
+      }
 
-    // Ensure you're passing both data and docId for each product
-    return snapshot.docs
-        .map((doc) => Product.fromFirestore(doc.data(), doc.id))
-        .toList();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .where('userId', isNotEqualTo: userId)  // Exclude products by the current user
+          .get();
+
+      return snapshot.docs
+          .map((doc) => Product.fromFirestore(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to load products: $e');
+    }
   }
 
   @override

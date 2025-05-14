@@ -5,6 +5,7 @@ import 'package:smartshopflutter/screens/favorite/favorite_screen.dart';
 import 'package:smartshopflutter/screens/home/home_screen.dart';
 import 'package:smartshopflutter/screens/profile/profile_screen.dart';
 import 'package:smartshopflutter/screens/sell/sell_lists_screen.dart';
+import 'package:smartshopflutter/screens/cart/cart_screen.dart';
 
 const Color inActiveIconColor = Color(0xFFB6B6B6);
 
@@ -29,9 +30,7 @@ class _InitScreenState extends State<InitScreen> {
   final pages = [
     const HomeScreen(),
     const SellListScreen(),
-    const Center(
-      child: Text("Chat"),
-    ),
+    const CartScreen(),
     const ProfileScreen()
   ];
 
@@ -47,72 +46,24 @@ class _InitScreenState extends State<InitScreen> {
         type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/Shop Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/Shop Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                kPrimaryColor,
-                BlendMode.srcIn,
-              ),
-            ),
+            icon: Icon(Icons.store_outlined, color: inActiveIconColor),
+            activeIcon: Icon(Icons.store, color: kPrimaryColor),
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/Heart Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/Heart Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                kPrimaryColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            label: "Fav",
+            icon: Icon(Icons.business_outlined, color: inActiveIconColor),
+            activeIcon: Icon(Icons.business, color: kPrimaryColor),
+            label: "Sell",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/Chat bubble Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/Chat bubble Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                Color.fromARGB(255, 255, 0, 0),
-                BlendMode.srcIn,
-              ),
-            ),
-            label: "Chat",
+            icon: Icon(Icons.shopping_cart_outlined, color: inActiveIconColor),
+            activeIcon: Icon(Icons.shopping_cart, color: kPrimaryColor),
+            label: "Cart",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/User Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/User Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                Color.fromARGB(255, 255, 0, 0),
-                BlendMode.srcIn,
-              ),
-            ),
-            label: "Fav",
+            icon: Icon(Icons.account_circle_outlined, color: inActiveIconColor),
+            activeIcon: Icon(Icons.account_circle, color: kPrimaryColor),
+            label: "Profile",
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // Import the CachedNetworkImage package
 
 import '../constants.dart';
 import '../models/Product.dart';
@@ -46,7 +47,18 @@ class ProductCard extends StatelessWidget {
                       } else if (snapshot.hasError || !snapshot.hasData) {
                         return const Center(child: Icon(Icons.broken_image));
                       } else {
-                        return Image.network(snapshot.data!, fit: BoxFit.cover);
+
+                        final imageUrl = snapshot.data!;
+                        // print("Image URL: $imageUrl"); // Debugging the URL
+                        // Use CachedNetworkImage here
+                        return CachedNetworkImage(
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          imageUrl: snapshot.data!,
+                          errorWidget: (context, url, error) => const Icon(Icons.broken_image),
+                          fit: BoxFit.cover,
+                        );
                       }
                     },
                   ),
@@ -73,23 +85,23 @@ class ProductCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(50),
                     onTap: () {},
                     child: Container(
-                      padding: const EdgeInsets.all(6),
-                      height: 24,
-                      width: 24,
-                      decoration: BoxDecoration(
-                        color: product.isFavourite
-                            ? kPrimaryColor.withOpacity(0.15)
-                            : kSecondaryColor.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: SvgPicture.asset(
-                        "assets/icons/Heart Icon_2.svg",
-                        colorFilter: ColorFilter.mode(
-                            product.isFavourite
-                                ? const Color.fromARGB(255, 255, 0, 0)
-                                : const Color(0xFFDBDEE4),
-                            BlendMode.srcIn),
-                      ),
+                      // padding: const EdgeInsets.all(6),
+                      // height: 24,
+                      // width: 24,
+                      // decoration: BoxDecoration(
+                      //   color: product.isFavourite
+                      //       ? kPrimaryColor.withOpacity(0.15)
+                      //       : kSecondaryColor.withOpacity(0.1),
+                      //   shape: BoxShape.circle,
+                      // ),
+                      // child: SvgPicture.asset(
+                      //   "assets/icons/Heart Icon_2.svg",
+                      //   colorFilter: ColorFilter.mode(
+                      //       product.isFavourite
+                      //           ? const Color.fromARGB(255, 255, 0, 0)
+                      //           : const Color(0xFFDBDEE4),
+                      //       BlendMode.srcIn),
+                      // ),
                     ),
                   ),
                 ],

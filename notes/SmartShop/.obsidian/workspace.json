@@ -42,17 +42,14 @@
             "id": "2654ff56d00e0a55",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "markdown",
               "state": {
-                "file": "Design/Nav Bar.canvas",
-                "viewState": {
-                  "x": 45,
-                  "y": 130,
-                  "zoom": 0
-                }
+                "file": "things left todo.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "Nav Bar"
+              "icon": "lucide-file",
+              "title": "things left todo"
             }
           }
         ],
@@ -205,16 +202,17 @@
   },
   "active": "2654ff56d00e0a55",
   "lastOpenFiles": [
-    "Design/Flow.canvas",
-    "Generate SHA-1.md",
-    "Flowish.md",
-    "things left todo.md",
-    "Design/Nav Bar.canvas",
     "Untitled.md",
-    "Untitled 1.md",
+    "Untitled 2.md",
     "Welcome.md",
+    "Flowish.md",
+    "Generate SHA-1.md",
     "Roles.md",
+    "things left todo.md",
+    "Untitled 1.md",
     "Design/Categories.md",
+    "Design/Nav Bar.canvas",
+    "Design/Flow.canvas",
     "Design"
   ]
 }

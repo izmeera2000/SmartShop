@@ -27,17 +27,16 @@ Future<List<Cart>> fetchCartItemsFromFirestore(String userId) async {
       // Get the productId from the document ID (which is the product ID)
       final productId = doc.id;
 
-      // Calculate the quantity as 1 since each document represents one product in the cart
+      // Calculate the quantity from the cart document or default to 1
+      final numOfItem = cartData['quantity'] ?? 1;
 
       // Log the cart data for debugging
       print('cartData: $cartData');
 
       if (productId != null) {
         // Safely get each field from cartData using null-aware operators
-        final title =
-            cartData['title'] ?? 'Unknown Title'; // Default value if null
-        final description =
-            cartData['description'] ?? 'No description available';
+        final title = cartData['title'] ?? 'Unknown Title'; // Default value if null
+        final description = cartData['description'] ?? 'No description available';
 
         // Debugging: log the 'images' field and its type
         print('images field: ${cartData['images']}');
@@ -49,16 +48,11 @@ Future<List<Cart>> fetchCartItemsFromFirestore(String userId) async {
         } else if (cartData['images'] != null) {
           images = [cartData['images'].toString()];
         }
-        final numOfItem = cartData['quantity'] ?? 1;
 
-        final rating = (cartData['rating'] as num?)?.toDouble() ??
-            0.0; // Default to 0.0 if null
-        final price = (cartData['price'] as num?)?.toDouble() ??
-            0.0; // Default to 0.0 if null
-        final isFavourite =
-            cartData['isFavourite'] ?? false; // Default to false if null
-        final isPopular =
-            cartData['isPopular'] ?? false; // Default to false if null
+        final rating = (cartData['rating'] as num?)?.toDouble() ?? 0.0; // Default to 0.0 if null
+        final price = (cartData['price'] as num?)?.toDouble() ?? 0.00;  // Default to 0.0 if null
+        final isFavourite = cartData['isFavourite'] ?? false; // Default to false if null
+        final isPopular = cartData['isPopular'] ?? false;   // Default to false if null
 
         // Create a Product object directly from the cart data
         final product = Product(
@@ -70,6 +64,7 @@ Future<List<Cart>> fetchCartItemsFromFirestore(String userId) async {
           price: price,
           isFavourite: isFavourite,
           isPopular: isPopular,
+          userId: cartData['userId'] ?? '', // Add the userId if needed for filtering
         );
 
         // Add the cart item to the cartItems list

@@ -11,6 +11,7 @@ class Product {
   final double price;
   final bool isFavourite;
   final bool isPopular;
+  final String userId; // Added userId field
 
   Product({
     required this.id,
@@ -22,6 +23,7 @@ class Product {
     required this.price,
     required this.isFavourite,
     required this.isPopular,
+    required this.userId, // Include userId in the constructor
   });
 
   // Method to parse hex color string to Color with error handling
@@ -54,9 +56,10 @@ class Product {
       images: List<String>.from(data['images'] ?? []), // Default empty list if no images
       // colors: colors,
       rating: (data['rating'] as num?)?.toDouble() ?? 0.0, // Default rating if null
-      price: (data['price'] as num?)?.toDouble() ?? 0.0,  // Default price if null
+      price: (data['price'] as num?)?.toDouble() ?? 0.00,  // Default price if null
       isFavourite: data['isFavourite'] ?? false, // Default false if not found
       isPopular: data['isPopular'] ?? false,   // Default false if not found
+      userId: data['userId'] ?? '',            // Default empty string if no userId
     );
   }
 }
