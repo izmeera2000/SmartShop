@@ -26,18 +26,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
     // Fetch the user ID first
     getUserID().then((userId) {
       if (userId != null) {
-        print('User ID retrieved: $userId'); // Logging user ID
+        debugPrint('User ID retrieved: $userId'); // Logging user ID
         loadCartFromFirestore(userId);
       } else {
-        print("User ID is null, please log in.");
+        debugPrint("User ID is null, please log in.");
       }
     });
   }
 
   Future<void> loadCartFromFirestore(String userId) async {
-    print('Loading cart for user: $userId'); // Logging cart load attempt
+    debugPrint('Loading cart for user: $userId'); // Logging cart load attempt
     final items = await fetchCartItemsFromFirestore(userId);
-    print(
+    debugPrint(
         'Cart items loaded: ${items.length} items'); // Logging number of items loaded
     setState(() {
       cartItems = items;
@@ -46,7 +46,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Future<void> removeCartItem(String userId, String productId) async {
-    print(
+    debugPrint(
         'Removing product with ID: $productId from cart for user: $userId'); // Logging product removal attempt
     final cartRef = FirebaseFirestore.instance
         .collection('users')
@@ -56,13 +56,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final cartDocs =
         await cartRef.where('productId', isEqualTo: productId).get();
     if (cartDocs.docs.isEmpty) {
-      print(
+      debugPrint(
           'No matching products found for product ID: $productId'); // Logging if no product was found
     }
 
     for (var doc in cartDocs.docs) {
       await doc.reference.delete();
-      print(
+      debugPrint(
           'Product with ID: $productId removed from Firestore'); // Logging successful removal
     }
   }

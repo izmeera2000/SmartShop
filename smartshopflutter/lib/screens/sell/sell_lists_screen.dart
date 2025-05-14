@@ -54,7 +54,7 @@ class SellListScreen extends StatelessWidget {
               ),
               itemBuilder: (context, index) {
                 final product = products[index];
-                // print(product.images[0]);
+                // debugPrint(product.images[0]);
                 return ProductCard(
                   product: product,
                   onPress: () {

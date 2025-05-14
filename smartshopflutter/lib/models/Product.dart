@@ -36,7 +36,7 @@ class Product {
         throw FormatException('Invalid hex color format');
       }
     } catch (e) {
-      print("Error parsing hex color: $e");
+      debugPrint("Error parsing hex color: $e");
       return Colors.grey;
     }
   }

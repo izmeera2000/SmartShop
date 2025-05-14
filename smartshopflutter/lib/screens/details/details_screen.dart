@@ -131,7 +131,7 @@ class DetailsScreen extends StatelessWidget {
                 try {
                   String? userId = await getUserID();
                   if (userId == null) {
-                    print('❌ No user ID found');
+                    debugPrint('❌ No user ID found');
                     return;
                   }
 
@@ -155,7 +155,7 @@ class DetailsScreen extends StatelessWidget {
                           currentQuantity + quantity, // Increment the quantity
                     });
 
-                    print(
+                    debugPrint(
                         '✅ Updated quantity to: ${currentQuantity + quantity}');
                   } else {
                     // If the product doesn't exist, add it to the cart with the current quantity
@@ -168,10 +168,10 @@ class DetailsScreen extends StatelessWidget {
                     };
 
                     await cartRef.set(cartItem);
-                    print('✅ Product added to cart with quantity: $quantity');
+                    debugPrint('✅ Product added to cart with quantity: $quantity');
                   }
                 } catch (e) {
-                  print('❌ Failed to add/update product in cart: $e');
+                  debugPrint('❌ Failed to add/update product in cart: $e');
                 }
               },
               child: const Text("Add To Cart"),

@@ -35,7 +35,8 @@ class CartCard extends StatelessWidget {
                 future: getImageUrl(cart.product.images[0]),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                    return const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2));
                   } else if (snapshot.hasError || !snapshot.hasData) {
                     return const Icon(Icons.broken_image, size: 50);
                   } else {
@@ -43,8 +44,12 @@ class CartCard extends StatelessWidget {
                     return CachedNetworkImage(
                       imageUrl: snapshot.data!,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) => const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 50),
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.broken_image, size: 50),
+                      cacheKey:
+                          snapshot.data!, // or a unique identifier of the product/image
                     );
                   }
                 },

@@ -38,11 +38,11 @@ void main() async {
 
   // Foreground message listener
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    print(
+    debugPrint(
         "Received a message while app is in the foreground: ${message.messageId}");
     if (message.notification != null) {
-      print('Notification Title: ${message.notification!.title}');
-      print('Notification Body: ${message.notification!.body}');
+      debugPrint('Notification Title: ${message.notification!.title}');
+      debugPrint('Notification Body: ${message.notification!.body}');
 
       // Show local notification when a message is received in the foreground
       _showNotification(
@@ -54,7 +54,7 @@ void main() async {
 
   // Get FCM token (for testing purposes)
   String? token = await FirebaseMessaging.instance.getToken();
-  print("FCM Token: $token");
+  debugPrint("FCM Token: $token");
 
   runApp(const MyApp());
 }
@@ -84,18 +84,18 @@ Future<void> _showNotification(
       platformDetails, // notification details
     );
 
-    print('Notification shown successfully.');
+    debugPrint('Notification shown successfully.');
 
   } catch (e) {
     // If an error occurs, log it
-    print('Error showing notification: $e');
+    debugPrint('Error showing notification: $e');
   }
 }
 
 
 // Background message handler
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling a background message: ${message.messageId}");
+  debugPrint("Handling a background message: ${message.messageId}");
   // Add your custom logic here
 }
 

@@ -39,7 +39,7 @@ Future<void> uploadProduct() async {
       _priceController.text.isEmpty ||
       _stockController.text.isEmpty) {
     // ✅ Validate stock too
-    print("All fields are required!");
+    debugPrint("All fields are required!");
     return;
   }
 
@@ -53,7 +53,7 @@ Future<void> uploadProduct() async {
         try {
           final compressedImage = await compressImage(image);
           if (compressedImage == null) {
-            print("Error compressing image: $image");
+            debugPrint("Error compressing image: $image");
             hasError = true;  // Set flag if error happens during compression
             break;  // Break the loop as we don't want to continue uploading
           }
@@ -64,7 +64,7 @@ Future<void> uploadProduct() async {
           await uploadTask;
           imagePaths.add(filePath);
         } catch (e) {
-          print("Error processing image: $e");
+          debugPrint("Error processing image: $e");
           hasError = true;  // Set flag if any error occurs during upload
           break;  // Stop the process on error
         }
@@ -72,7 +72,7 @@ Future<void> uploadProduct() async {
     }
 
     if (hasError) {
-      print("Upload aborted due to image error");
+      debugPrint("Upload aborted due to image error");
       return;  // Exit the function if an error occurs
     }
 
@@ -88,7 +88,7 @@ Future<void> uploadProduct() async {
 
     await FirebaseFirestore.instance.collection('products').add(productData);
 
-    print("Product uploaded successfully!");
+    debugPrint("Product uploaded successfully!");
 
     // Clear form fields
     _titleController.clear();
@@ -100,7 +100,7 @@ Future<void> uploadProduct() async {
       _isPopular = false;
     });
   } catch (e) {
-    print("Error uploading product: $e");
+    debugPrint("Error uploading product: $e");
   }
 }
 
@@ -116,7 +116,7 @@ Future<void> uploadProduct() async {
         _image = pickedFiles.map((file) => File(file.path)).toList();
       });
     } else {
-      print("No images selected.");
+      debugPrint("No images selected.");
     }
   }
 

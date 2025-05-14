@@ -42,11 +42,15 @@ class _ProductImagesState extends State<ProductImages> {
                 } else if (snapshot.hasError || !snapshot.hasData) {
                   return const Center(child: Icon(Icons.broken_image, size: 60));
                 } else {
-                  return CachedNetworkImage(
-                    imageUrl: snapshot.data!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 60),
+                  return ClipRRect(
+                    child: CachedNetworkImage(
+                      imageUrl: snapshot.data!,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 60),
+                         cacheKey:
+                          snapshot.data!, 
+                    ),
                   );
                 }
               },
@@ -98,7 +102,7 @@ class SmallProductImage extends StatelessWidget {
       child: AnimatedContainer(
         duration: defaultDuration,
         margin: const EdgeInsets.only(right: 16),
-        padding: const EdgeInsets.all(8),
+        // padding: const EdgeInsets.all(8),
         height: 48,
         width: 48,
         decoration: BoxDecoration(
@@ -116,11 +120,17 @@ class SmallProductImage extends StatelessWidget {
             } else if (snapshot.hasError || !snapshot.hasData) {
               return const Icon(Icons.broken_image, size: 24);
             } else {
-              return CachedNetworkImage(
-                imageUrl: snapshot.data!,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 24),
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(
+                              10), //
+                child: CachedNetworkImage(
+                  imageUrl: snapshot.data!,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 24),
+                     cacheKey:
+                          snapshot.data!, 
+                ),
               );
             }
           },

@@ -145,7 +145,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                   if (user != null) {
                     // Get FCM token after login or profile update
                     String? token = await FirebaseMessaging.instance.getToken();
-                    print("FCM Token: $token");
+                    debugPrint("FCM Token: $token");
 
                     if (token != null) {
                       // Fetch existing FCM tokens from Firestore

@@ -46,7 +46,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Future<void> removeCartItem(String userId, String productId) async {
-    print('Removing product with ID: $productId from cart for user: $userId'); // Logging product removal attempt
+    debugPrint('Removing product with ID: $productId from cart for user: $userId'); // Logging product removal attempt
     final cartRef = FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
@@ -54,12 +54,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     final cartDocs = await cartRef.where('productId', isEqualTo: productId).get();
     if (cartDocs.docs.isEmpty) {
-      print('No matching products found for product ID: $productId'); // Logging if no product was found
+      debugPrint('No matching products found for product ID: $productId'); // Logging if no product was found
     }
 
     for (var doc in cartDocs.docs) {
       await doc.reference.delete();
-      print('Product with ID: $productId removed from Firestore'); // Logging successful removal
+      debugPrint('Product with ID: $productId removed from Firestore'); // Logging successful removal
     }
   }
 

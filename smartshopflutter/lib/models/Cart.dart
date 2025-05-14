@@ -31,7 +31,7 @@ Future<List<Cart>> fetchCartItemsFromFirestore(String userId) async {
       final numOfItem = cartData['quantity'] ?? 1;
 
       // Log the cart data for debugging
-      print('cartData: $cartData');
+      debugPrint('cartData: $cartData');
 
       if (productId != null) {
         // Safely get each field from cartData using null-aware operators
@@ -39,8 +39,8 @@ Future<List<Cart>> fetchCartItemsFromFirestore(String userId) async {
         final description = cartData['description'] ?? 'No description available';
 
         // Debugging: log the 'images' field and its type
-        print('images field: ${cartData['images']}');
-        print('images field type: ${cartData['images'].runtimeType}');
+        debugPrint('images field: ${cartData['images']}');
+        debugPrint('images field type: ${cartData['images'].runtimeType}');
 
         List<String> images = [];
         if (cartData['images'] is List) {
@@ -72,16 +72,16 @@ final stock = (cartData['stock'] as num?)?.toInt() ?? 0; // ✅ Default to 0 if 
         // Add the cart item to the cartItems list
         cartItems.add(Cart(product: product, numOfItem: numOfItem));
       } else {
-        print('Missing productId in cart data');
+        debugPrint('Missing productId in cart data');
       }
     }
 
     // Log the total number of items in the cart
-    print('Total number of items in cart: ${cartItems.length}');
+    debugPrint('Total number of items in cart: ${cartItems.length}');
 
     return cartItems;
   } catch (e) {
-    print('Error fetching cart items: $e');
+    debugPrint('Error fetching cart items: $e');
     return [];
   }
 }

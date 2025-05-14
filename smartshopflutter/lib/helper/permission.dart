@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<void> requestPermissions() async {
@@ -5,6 +6,6 @@ Future<void> requestPermissions() async {
   final galleryStatus = await Permission.photos.request();
 
   if (!cameraStatus.isGranted || !galleryStatus.isGranted) {
-    print("Permission not granted!");
+    debugPrint("Permission not granted!");
   }
 }

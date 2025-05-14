@@ -25,18 +25,18 @@ class _CartScreenState extends State<CartScreen> {
     // Fetch the user ID first
     getUserID().then((userId) {
       if (userId != null) {
-        print('User ID retrieved: $userId'); // Logging user ID
+        debugPrint('User ID retrieved: $userId'); // Logging user ID
         loadCartFromFirestore(userId);
       } else {
-        print("User ID is null, please log in.");
+        debugPrint("User ID is null, please log in.");
       }
     });
   }
 
   Future<void> loadCartFromFirestore(String userId) async {
-    print('Loading cart for user: $userId'); // Logging cart load attempt
+    debugPrint('Loading cart for user: $userId'); // Logging cart load attempt
     final items = await fetchCartItemsFromFirestore(userId);
-    print('Cart items loaded: ${items.length} items'); // Logging number of items loaded
+    debugPrint('Cart items loaded: ${items.length} items'); // Logging number of items loaded
     setState(() {
       cartItems = items;
       isLoading = false;
@@ -44,7 +44,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> removeCartItem(String userId, String productId) async {
-    print('Removing product with ID: $productId from cart for user: $userId'); // Logging product removal attempt
+    debugPrint('Removing product with ID: $productId from cart for user: $userId'); // Logging product removal attempt
     final cartRef = FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
@@ -52,12 +52,12 @@ class _CartScreenState extends State<CartScreen> {
 
     final cartDocs = await cartRef.where('productId', isEqualTo: productId).get();
     if (cartDocs.docs.isEmpty) {
-      print('No matching products found for product ID: $productId'); // Logging if no product was found
+      debugPrint('No matching products found for product ID: $productId'); // Logging if no product was found
     }
 
     for (var doc in cartDocs.docs) {
       await doc.reference.delete();
-      print('Product with ID: $productId removed from Firestore'); // Logging successful removal
+      debugPrint('Product with ID: $productId removed from Firestore'); // Logging successful removal
     }
   }
 
@@ -105,7 +105,7 @@ Widget build(BuildContext context) {
                   direction: DismissDirection.endToStart,
                   onDismissed: (direction) async {
                     final productId = cartItems[index].product.id;
-                    print('Dismissed product with ID: $productId');
+                    debugPrint('Dismissed product with ID: $productId');
 
                     final userId = await getUserID();
                     if (userId != null) {
@@ -114,7 +114,7 @@ Widget build(BuildContext context) {
                       });
                       removeCartItem(userId, productId);
                     } else {
-                      print('Failed to remove item. User not logged in.');
+                      debugPrint('Failed to remove item. User not logged in.');
                     }
                   },
                   background: Container(

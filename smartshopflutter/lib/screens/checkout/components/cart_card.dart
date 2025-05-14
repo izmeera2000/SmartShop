@@ -45,6 +45,8 @@ class CartCard extends StatelessWidget {
                       fit: BoxFit.cover,
                       placeholder: (context, url) => const CircularProgressIndicator(),
                       errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 50),
+                         cacheKey:
+                          snapshot.data!, 
                     );
                   }
                 },

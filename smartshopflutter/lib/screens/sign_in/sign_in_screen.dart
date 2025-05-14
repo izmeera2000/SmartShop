@@ -32,12 +32,12 @@ class SignInScreen extends StatelessWidget {
 
       // Sign in to Firebase with the Google credential
       UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      print(" no error");
+      debugPrint(" no error");
 
       return userCredential.user;
     } catch (e) {
       // Handle any errors here
-      print("Error during Google Sign-In: $e");
+      debugPrint("Error during Google Sign-In: $e");
       return null;
     }
   }
@@ -82,10 +82,10 @@ class SignInScreen extends StatelessWidget {
                           User? user = await signInWithGoogle(context);
                           if (user != null) {
                             // If sign-in is successful, you can navigate to a new screen or handle the user data
-                            print("Google Sign-In successful: ${user.displayName}");
+                            debugPrint("Google Sign-In successful: ${user.displayName}");
                             // You can navigate to the home screen or another page
                           } else {
-                            print("Google Sign-In failed.");
+                            debugPrint("Google Sign-In failed.");
                           }
                         },
                       ),

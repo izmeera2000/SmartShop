@@ -55,7 +55,7 @@ class _SellEditScreenState extends State<SellEditScreen> {
         _image = pickedFiles.map((file) => File(file.path)).toList();
       });
     } else {
-      print("No images selected.");
+      debugPrint("No images selected.");
     }
   }
 
@@ -64,7 +64,7 @@ class _SellEditScreenState extends State<SellEditScreen> {
         _descriptionController.text.isEmpty ||
         _priceController.text.isEmpty ||
         _stockController.text.isEmpty) {
-      print("All fields are required!");
+      debugPrint("All fields are required!");
       return;
     }
 
@@ -99,10 +99,10 @@ class _SellEditScreenState extends State<SellEditScreen> {
         'images': imagePaths,
       });
 
-      print("Product updated successfully!");
+      debugPrint("Product updated successfully!");
       Navigator.pop(context);
     } catch (e) {
-      print("Error updating product: $e");
+      debugPrint("Error updating product: $e");
     }
   }
 

@@ -152,7 +152,7 @@ class _SignFormState extends State<SignForm> {
                   if (user != null) {
                     // Get FCM token after login
                     String? token = await FirebaseMessaging.instance.getToken();
-                    print("FCM Token: $token");
+                    debugPrint("FCM Token: $token");
 
                     if (token != null) {
                       // Get the existing FCM tokens from Firestore (check if it exists)
@@ -188,14 +188,14 @@ class _SignFormState extends State<SignForm> {
                         'fcmTokens': fcmTokens, // Save the list of FCM tokens
                       }, SetOptions(merge: true));
 
-                      print(
+                      debugPrint(
                           '✅ User data and FCM tokens saved to Firestore: ${user.uid}');
                     }
 
                     // Save user data to SharedPreferences
                     await saveUserData(
                         email: user.email ?? "No Email", uid: user.uid);
-                    print('✅ User data saved locally: ${user.uid}');
+                    debugPrint('✅ User data saved locally: ${user.uid}');
 
                     // Navigate to success screen
                     Navigator.pushNamedAndRemoveUntil(
