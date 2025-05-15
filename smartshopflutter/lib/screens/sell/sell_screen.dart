@@ -76,15 +76,16 @@ Future<void> uploadProduct() async {
       return;  // Exit the function if an error occurs
     }
 
-    final productData = {
-      'title': _titleController.text,
-      'description': _descriptionController.text,
-      'price': double.tryParse(_priceController.text) ?? 0.0,
-      'stock': int.tryParse(_stockController.text) ?? 0, // ✅ Save stock as int
-      'isPopular': _isPopular, // ✅ Save popular as bool
-      'images': imagePaths,
-      'userId': userId,
-    };
+      final productData = {
+        'title': _titleController.text,
+        'description': _descriptionController.text,
+        'price': double.tryParse(_priceController.text) ?? 0.0,
+        'stock':
+            int.tryParse(_stockController.text) ?? 0, // ✅ Save stock as int
+        'popular': _isPopular, // ✅ Save popular as bool
+        'images': imagePaths,
+        'userId': userId,
+      };
 
     await FirebaseFirestore.instance.collection('products').add(productData);
 
