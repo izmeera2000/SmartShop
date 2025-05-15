@@ -20,7 +20,7 @@ class ProfileScreen extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             appBar: AppBar(
-              title: const Text("Profile"),
+              // title: const Text("Profile"),
             ),
             body: Center(child: CircularProgressIndicator()),
           );
@@ -31,7 +31,7 @@ class ProfileScreen extends StatelessWidget {
 
           return Scaffold(
             appBar: AppBar(
-              title: const Text("Profile"),
+              // title: const Text("Profile"),
             ),
             body: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 20),

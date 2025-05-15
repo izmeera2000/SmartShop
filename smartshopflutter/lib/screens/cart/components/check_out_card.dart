@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:smartshopflutter/screens/checkout/checkout_screen.dart';
 
 import '../../../constants.dart';
 
@@ -70,8 +71,10 @@ class CheckoutCard extends StatelessWidget {
                       text: "Total:\n",
                       children: [
                         TextSpan(
-                          text: "\RM${totalPrice.toStringAsFixed(2)}", // Display total price
-                          style: const TextStyle(fontSize: 16, color: Colors.black),
+                          text:
+                              "\RM${totalPrice.toStringAsFixed(2)}", // Display total price
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.black),
                         ),
                       ],
                     ),
@@ -79,7 +82,9 @@ class CheckoutCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, CheckoutScreen.routeName);
+                    },
                     child: const Text("Check Out"),
                   ),
                 ),

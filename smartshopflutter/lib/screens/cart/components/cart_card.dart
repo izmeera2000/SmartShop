@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart'; // Add this if not already imported
+import 'package:cached_network_image/cached_network_image.dart'; // Import cached_network_image
 import '../../../constants.dart';
 import '../../../models/Cart.dart';
 
@@ -34,11 +35,22 @@ class CartCard extends StatelessWidget {
                 future: getImageUrl(cart.product.images[0]),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                    return const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2));
                   } else if (snapshot.hasError || !snapshot.hasData) {
                     return const Icon(Icons.broken_image, size: 50);
                   } else {
-                    return Image.network(snapshot.data!, fit: BoxFit.cover);
+                    // Use CachedNetworkImage instead of Image.network
+                    return CachedNetworkImage(
+                      imageUrl: snapshot.data!,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.broken_image, size: 50),
+                      cacheKey:
+                          snapshot.data!, // or a unique identifier of the product/image
+                    );
                   }
                 },
               ),

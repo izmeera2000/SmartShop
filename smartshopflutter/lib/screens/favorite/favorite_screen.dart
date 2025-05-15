@@ -17,61 +17,61 @@ class FavoriteScreen extends StatelessWidget {
             "Favorites",
             style: Theme.of(context).textTheme.titleLarge,
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('products')
-                    .where('isFavourite', isEqualTo: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+          // Expanded(
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(16),
+          //     child: StreamBuilder<QuerySnapshot>(
+          //       stream: FirebaseFirestore.instance
+          //           .collection('products')
+          //           .where('isFavourite', isEqualTo: true)
+          //           .snapshots(),
+          //       builder: (context, snapshot) {
+          //         if (snapshot.connectionState == ConnectionState.waiting) {
+          //           return const Center(child: CircularProgressIndicator());
+          //         }
 
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(child: Text("No favorite products found."));
-                  }
+          //         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          //           return const Center(child: Text("No favorite products found."));
+          //         }
 
-                  final favoriteProducts = snapshot.data!.docs.map((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    return Product(
-                      id: data['id'],
-                      title: data['title'],
-                      description: data['description'],
-                      images: List<String>.from(data['images']),
-                      // colors: (data['colors'] as List)
-                      //     .map((hex) => Color(int.parse(hex)))
-                      //     .toList(),
-                      rating: (data['rating'] as num).toDouble(),
-                      price: (data['price'] as num).toDouble(),
-                      isFavourite: data['isFavourite'],
-                      isPopular: data['isPopular'],
-                    );
-                  }).toList();
+          //         final favoriteProducts = snapshot.data!.docs.map((doc) {
+          //           final data = doc.data() as Map<String, dynamic>;
 
-                  return GridView.builder(
-                    itemCount: favoriteProducts.length,
-                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 200,
-                      childAspectRatio: 0.7,
-                      mainAxisSpacing: 20,
-                      crossAxisSpacing: 16,
-                    ),
-                    itemBuilder: (context, index) => ProductCard(
-                      product: favoriteProducts[index],
-                      onPress: () => Navigator.pushNamed(
-                        context,
-                        DetailsScreen.routeName,
-                        arguments: ProductDetailsArguments(product: favoriteProducts[index]),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          )
+          //           // Safely create Product instances, ensuring no null fields
+          //           return Product(
+          //             id: doc.id, // Use doc.id for the product ID
+          //             title: data['title'] ?? 'Unknown Title',
+          //             description: data['description'] ?? 'No description available',
+          //             images: List<String>.from(data['images'] ?? []),
+          //             rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
+          //             price: (data['price'] as num?)?.toDouble() ?? 0.0,
+          //             isFavourite: data['isFavourite'] ?? false,
+          //             isPopular: data['isPopular'] ?? false,
+          //             userId: data['userId'] ?? '', // Include userId if needed
+          //           );
+          //         }).toList();
+
+          //         return GridView.builder(
+          //           itemCount: favoriteProducts.length,
+          //           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          //             maxCrossAxisExtent: 200,
+          //             childAspectRatio: 0.7,
+          //             mainAxisSpacing: 20,
+          //             crossAxisSpacing: 16,
+          //           ),
+          //           itemBuilder: (context, index) => ProductCard(
+          //             product: favoriteProducts[index],
+          //             onPress: () => Navigator.pushNamed(
+          //               context,
+          //               DetailsScreen.routeName,
+          //               arguments: ProductDetailsArguments(product: favoriteProducts[index]),
+          //             ),
+          //           ),
+          //         );
+          //       },
+          //     ),
+          //   ),
+          // )
         ],
       ),
     );

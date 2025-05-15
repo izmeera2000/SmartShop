@@ -5,6 +5,7 @@ import 'package:smartshopflutter/screens/favorite/favorite_screen.dart';
 import 'package:smartshopflutter/screens/home/home_screen.dart';
 import 'package:smartshopflutter/screens/profile/profile_screen.dart';
 import 'package:smartshopflutter/screens/sell/sell_lists_screen.dart';
+import 'package:smartshopflutter/screens/cart/cart_screen.dart';
 
 const Color inActiveIconColor = Color(0xFFB6B6B6);
 
@@ -20,6 +21,8 @@ class InitScreen extends StatefulWidget {
 class _InitScreenState extends State<InitScreen> {
   int currentSelectedIndex = 0;
 
+  DateTime? _lastPressedAt;
+
   void updateCurrentIndex(int index) {
     setState(() {
       currentSelectedIndex = index;
@@ -29,92 +32,59 @@ class _InitScreenState extends State<InitScreen> {
   final pages = [
     const HomeScreen(),
     const SellListScreen(),
-    const Center(
-      child: Text("Chat"),
-    ),
+    const CartScreen(),
     const ProfileScreen()
   ];
 
+  Future<bool> _onWillPop() async {
+    final now = DateTime.now();
+    if (_lastPressedAt == null ||
+        now.difference(_lastPressedAt!) > const Duration(seconds: 2)) {
+      // If back button is pressed again within 2 seconds, exit the app
+      _lastPressedAt = now;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Press back again to exit')),
+      );
+      return Future.value(false); // Prevent default back button action
+    }
+    return Future.value(true); // Allow exit after second back press
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: pages[currentSelectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: updateCurrentIndex,
-        currentIndex: currentSelectedIndex,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/Shop Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
-              ),
+    return WillPopScope(
+      onWillPop: _onWillPop, // Handle back press event
+      child: Scaffold(
+        body: pages[currentSelectedIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          onTap: updateCurrentIndex,
+          currentIndex: currentSelectedIndex,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          type: BottomNavigationBarType.fixed,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.store_outlined, color: inActiveIconColor),
+              activeIcon: Icon(Icons.store, color: kPrimaryColor),
+              label: "Home",
             ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/Shop Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                kPrimaryColor,
-                BlendMode.srcIn,
-              ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.business_outlined, color: inActiveIconColor),
+              activeIcon: Icon(Icons.business, color: kPrimaryColor),
+              label: "Sell",
             ),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/Heart Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
-              ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart_outlined, color: inActiveIconColor),
+              activeIcon: Icon(Icons.shopping_cart, color: kPrimaryColor),
+              label: "Cart",
             ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/Heart Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                kPrimaryColor,
-                BlendMode.srcIn,
-              ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle_outlined, color: inActiveIconColor),
+              activeIcon: Icon(Icons.account_circle, color: kPrimaryColor),
+              label: "Profile",
             ),
-            label: "Fav",
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/Chat bubble Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/Chat bubble Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                Color.fromARGB(255, 255, 0, 0),
-                BlendMode.srcIn,
-              ),
-            ),
-            label: "Chat",
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/User Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/User Icon.svg",
-              colorFilter: const ColorFilter.mode(
-                Color.fromARGB(255, 255, 0, 0),
-                BlendMode.srcIn,
-              ),
-            ),
-            label: "Fav",
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

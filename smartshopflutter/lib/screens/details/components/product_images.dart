@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cached_network_image/cached_network_image.dart';  // Import cached_network_image
 
 import '../../../constants.dart';
 import '../../../models/Product.dart';
@@ -21,9 +22,7 @@ class _ProductImagesState extends State<ProductImages> {
   int selectedImage = 0;
 
   Future<String> getImageUrl(String path) async {
-    // Get the Firebase Storage reference for the image
     final storageRef = FirebaseStorage.instance.ref(path);
-    // Get the download URL
     return await storageRef.getDownloadURL();
   }
 
@@ -43,7 +42,16 @@ class _ProductImagesState extends State<ProductImages> {
                 } else if (snapshot.hasError || !snapshot.hasData) {
                   return const Center(child: Icon(Icons.broken_image, size: 60));
                 } else {
-                  return Image.network(snapshot.data!, fit: BoxFit.cover);
+                  return ClipRRect(
+                    child: CachedNetworkImage(
+                      imageUrl: snapshot.data!,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 60),
+                         cacheKey:
+                          snapshot.data!, 
+                    ),
+                  );
                 }
               },
             ),
@@ -94,7 +102,7 @@ class SmallProductImage extends StatelessWidget {
       child: AnimatedContainer(
         duration: defaultDuration,
         margin: const EdgeInsets.only(right: 16),
-        padding: const EdgeInsets.all(8),
+        // padding: const EdgeInsets.all(8),
         height: 48,
         width: 48,
         decoration: BoxDecoration(
@@ -112,7 +120,18 @@ class SmallProductImage extends StatelessWidget {
             } else if (snapshot.hasError || !snapshot.hasData) {
               return const Icon(Icons.broken_image, size: 24);
             } else {
-              return Image.network(snapshot.data!, fit: BoxFit.cover);
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(
+                              10), //
+                child: CachedNetworkImage(
+                  imageUrl: snapshot.data!,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 24),
+                     cacheKey:
+                          snapshot.data!, 
+                ),
+              );
             }
           },
         ),
