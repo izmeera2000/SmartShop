@@ -6,6 +6,7 @@ import 'package:smartshopflutter/components/save_details.dart'; // Import save_d
 
 import 'components/profile_menu.dart';
 import 'components/profile_pic.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 
 class ProfileScreen extends StatelessWidget {
   static String routeName = "/profile";
@@ -70,11 +71,18 @@ class ProfileScreen extends StatelessWidget {
                     text: "Log Out",
                     icon: "assets/icons/Log out.svg",
                     press: () async {
+                      // Clear SharedPreferences
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.clear(); // Clear all stored data
+
+                      // Sign out the user
                       await FirebaseAuth.instance.signOut();
+
+                      // Redirect to sign-in screen after logout
                       Navigator.pushNamedAndRemoveUntil(
                         context,
-                        "/sign_in", // Redirect to sign-in screen after logout
-                        (route) => false,
+                        "/sign_in", // Sign-in screen route
+                        (route) => false, // Remove all routes from the stack
                       );
                     },
                   ),

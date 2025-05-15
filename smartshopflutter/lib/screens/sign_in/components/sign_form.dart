@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
@@ -9,7 +10,6 @@ import '../../../constants.dart';
 import '../../../helper/keyboard.dart';
 import '../../forgot_password/forgot_password_screen.dart';
 import '../../login_success/login_success_screen.dart';
-import 'package:smartshopflutter/components/save_details.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -24,10 +24,15 @@ class _SignFormState extends State<SignForm> {
   final _formKey = GlobalKey<FormState>();
   String? email;
   String? password;
-    bool _isPasswordVisible = false;
-
-  bool? remember = false;
+  bool _isPasswordVisible = false;
+  bool? remember = false;  // Remember me checkbox
   final List<String?> errors = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRememberMe();  // Check if user should be auto-logged in
+  }
 
   void addError({String? error}) {
     if (!errors.contains(error)) {
@@ -45,6 +50,86 @@ class _SignFormState extends State<SignForm> {
     }
   }
 
+  // Add this method to check the SharedPreferences for login details
+  void _checkRememberMe() async {
+    final prefs = await SharedPreferences.getInstance();
+    final bool isRemembered = prefs.getBool('remember') ?? false;
+
+    if (isRemembered) {
+      final String? storedEmail = prefs.getString('email');
+      final String? storedPassword = prefs.getString('password');
+
+      if (storedEmail != null && storedPassword != null) {
+        // Auto login if remember is checked
+        _signInWithEmailPassword(storedEmail, storedPassword);
+      }
+    }
+  }
+
+  // Auto login function
+  Future<void> _signInWithEmailPassword(String email, String password) async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final user = userCredential.user;
+
+      if (user != null) {
+        // Get FCM token after login
+        String? token = await FirebaseMessaging.instance.getToken();
+        debugPrint("FCM Token: $token");
+
+        if (token != null) {
+          DocumentSnapshot userDoc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+
+          Map<String, dynamic> userData =
+              userDoc.data() as Map<String, dynamic>;
+
+          List<String> fcmTokens =
+              List.from(userData['fcmTokens'] ?? []);
+
+          if (!fcmTokens.contains(token)) {
+            fcmTokens.add(token);
+          }
+
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
+            {
+              'email': user.email,
+              'uid': user.uid,
+              'lastLogin': FieldValue.serverTimestamp(),
+              'fcmTokens': fcmTokens,
+            },
+            SetOptions(merge: true),
+          );
+
+          debugPrint('✅ User data and FCM tokens saved to Firestore: ${user.uid}');
+        }
+
+        // Navigate to success screen
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          LoginSuccessScreen.routeName,
+          (Route<dynamic> route) => false,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
+
+  // Save user credentials in SharedPreferences
+  Future<void> _saveLoginDetails(String email, String password) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('remember', remember ?? false);
+    prefs.setString('email', email);
+    prefs.setString('password', password);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -60,7 +145,6 @@ class _SignFormState extends State<SignForm> {
               } else if (emailValidatorRegExp.hasMatch(value)) {
                 removeError(error: kInvalidEmailError);
               }
-              return;
             },
             validator: (value) {
               if (value!.isEmpty) {
@@ -75,16 +159,13 @@ class _SignFormState extends State<SignForm> {
             decoration: const InputDecoration(
               labelText: "Email",
               hintText: "Enter your email",
-              // If  you are using latest version of flutter then lable text and hint text shown like this
-              // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
               suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
             ),
           ),
           const SizedBox(height: 20),
           TextFormField(
-            obscureText:
-                !_isPasswordVisible, // This is the toggle for visibility
+            obscureText: !_isPasswordVisible,
             onSaved: (newValue) => password = newValue,
             onChanged: (value) {
               if (value.isNotEmpty) {
@@ -92,7 +173,6 @@ class _SignFormState extends State<SignForm> {
               } else if (value.length >= 8) {
                 removeError(error: 'Password is too short');
               }
-              return;
             },
             validator: (value) {
               if (value!.isEmpty) {
@@ -115,8 +195,7 @@ class _SignFormState extends State<SignForm> {
                 ),
                 onPressed: () {
                   setState(() {
-                    _isPasswordVisible =
-                        !_isPasswordVisible; // Toggle visibility
+                    _isPasswordVisible = !_isPasswordVisible;
                   });
                 },
               ),
@@ -137,10 +216,9 @@ class _SignFormState extends State<SignForm> {
               const Text("Remember me"),
               const Spacer(),
               GestureDetector(
-                onTap: () => Navigator.pushNamed(
-                    context, ForgotPasswordScreen.routeName),
+                onTap: () => Navigator.pushNamed(context, ForgotPasswordScreen.routeName),
                 child: const Text("Forgot Password", style: TextStyle()),
-              )
+              ),
             ],
           ),
           FormError(errors: errors),
@@ -162,52 +240,43 @@ class _SignFormState extends State<SignForm> {
                   final user = userCredential.user;
 
                   if (user != null) {
+                    // Save login details if 'Remember me' is checked
+                    if (remember == true) {
+                      await _saveLoginDetails(email!, password!);
+                    }
+
                     // Get FCM token after login
                     String? token = await FirebaseMessaging.instance.getToken();
                     debugPrint("FCM Token: $token");
 
                     if (token != null) {
-                      // Get the existing FCM tokens from Firestore (check if it exists)
-                      DocumentSnapshot userDoc = await FirebaseFirestore
-                          .instance
+                      DocumentSnapshot userDoc = await FirebaseFirestore.instance
                           .collection('users')
                           .doc(user.uid)
                           .get();
 
-                      // Initialize the fcmTokens field if it doesn't exist
-                      // Safely cast the data to Map<String, dynamic>
                       Map<String, dynamic> userData =
                           userDoc.data() as Map<String, dynamic>;
 
-// Initialize the fcmTokens field if it doesn't exist
                       List<String> fcmTokens =
                           List.from(userData['fcmTokens'] ?? []);
 
-                      // Add the new token to the list (if it's not already present)
                       if (!fcmTokens.contains(token)) {
-                        fcmTokens.add(
-                            token); // Add the token if it's not already in the list
+                        fcmTokens.add(token);
                       }
 
-                      // Save the user data along with the updated FCM token list to Firestore
-                      await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(user.uid)
-                          .set({
-                        'email': user.email,
-                        'uid': user.uid,
-                        'lastLogin': FieldValue.serverTimestamp(),
-                        'fcmTokens': fcmTokens, // Save the list of FCM tokens
-                      }, SetOptions(merge: true));
+                      await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
+                        {
+                          'email': user.email,
+                          'uid': user.uid,
+                          'lastLogin': FieldValue.serverTimestamp(),
+                          'fcmTokens': fcmTokens,
+                        },
+                        SetOptions(merge: true),
+                      );
 
-                      debugPrint(
-                          '✅ User data and FCM tokens saved to Firestore: ${user.uid}');
+                      debugPrint('✅ User data and FCM tokens saved to Firestore: ${user.uid}');
                     }
-
-                    // Save user data to SharedPreferences
-                    await saveUserData(
-                        email: user.email ?? "No Email", uid: user.uid);
-                    debugPrint('✅ User data saved locally: ${user.uid}');
 
                     // Navigate to success screen
                     Navigator.pushNamedAndRemoveUntil(
