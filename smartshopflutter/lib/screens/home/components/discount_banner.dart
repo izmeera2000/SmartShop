@@ -17,16 +17,16 @@ class DiscountBanner extends StatelessWidget {
         vertical: 16,
       ),
       decoration: BoxDecoration(
-        color: kPrimaryColor,
+        color: const Color.fromARGB(255, 21, 0, 255),
         borderRadius: BorderRadius.circular(20),
       ),
       child: const Text.rich(
         TextSpan(
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Color.fromRGBO(255, 255, 255, 1)),
           children: [
-            TextSpan(text: "A Summer Surpise\n"),
+            TextSpan(text: "welcome to\n"),
             TextSpan(
-              text: "Cashback 20%",
+              text: "SMART SHOP",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
