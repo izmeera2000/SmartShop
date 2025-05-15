@@ -41,7 +41,7 @@ class ProfileMenu extends StatelessWidget {
             Expanded(child: Text(text)),
             const Icon(
               Icons.arrow_forward_ios,
-              color: kPrimaryColor,
+              color: Color.fromARGB(255, 255, 0, 0),
             ),
           ],
         ),

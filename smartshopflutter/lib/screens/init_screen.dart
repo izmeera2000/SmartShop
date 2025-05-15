@@ -65,22 +65,22 @@ class _InitScreenState extends State<InitScreen> {
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.store_outlined, color: inActiveIconColor),
-              activeIcon: Icon(Icons.store, color: kPrimaryColor),
+              activeIcon: Icon(Icons.store, color: const Color.fromARGB(255, 255, 0, 0)),
               label: "Home",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.business_outlined, color: inActiveIconColor),
-              activeIcon: Icon(Icons.business, color: kPrimaryColor),
+              activeIcon: Icon(Icons.business, color: const Color.fromARGB(255, 255, 0, 0)),
               label: "Sell",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.shopping_cart_outlined, color: inActiveIconColor),
-              activeIcon: Icon(Icons.shopping_cart, color: kPrimaryColor),
+              activeIcon: Icon(Icons.shopping_cart, color: const Color.fromARGB(255, 255, 0, 0)),
               label: "Cart",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.account_circle_outlined, color: inActiveIconColor),
-              activeIcon: Icon(Icons.account_circle, color: kPrimaryColor),
+              activeIcon: Icon(Icons.account_circle, color: const Color.fromARGB(255, 255, 0, 0)),
               label: "Profile",
             ),
           ],

@@ -23,8 +23,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   int selectedIndex = -1;
 
   List<String> deliveryAddresses = [
-    "H-R-56, West street, Pennsylvania, USA.",
-    "H-R-57, West street, Pennsylvania, USA."
+    "POINT 1, POKEP (BLOCK A).",
+    "POINT 2, GUARD HOUSE (BLOCK C)."
   ];
 
   @override
@@ -99,7 +99,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           color: Colors.grey[50],
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: selectedIndex == index ? kPrimaryColor : Colors.transparent,
+                            color: selectedIndex == index ? const Color.fromARGB(255, 255, 0, 0) : Colors.transparent,
                             width: 2,
                           ),
                         ),
