@@ -168,7 +168,9 @@ class DetailsScreen extends StatelessWidget {
                     };
 
                     await cartRef.set(cartItem);
-                    debugPrint('✅ Product added to cart with quantity: $quantity');
+                    debugPrint(
+                        '✅ Product added to cart with quantity: $quantity');
+                    Navigator.pop(context);
                   }
                 } catch (e) {
                   debugPrint('❌ Failed to add/update product in cart: $e');
