@@ -24,6 +24,8 @@ class _SignFormState extends State<SignForm> {
   final _formKey = GlobalKey<FormState>();
   String? email;
   String? password;
+    bool _isPasswordVisible = false;
+
   bool? remember = false;
   final List<String?> errors = [];
 
@@ -81,33 +83,43 @@ class _SignFormState extends State<SignForm> {
           ),
           const SizedBox(height: 20),
           TextFormField(
-            obscureText: true,
+            obscureText:
+                !_isPasswordVisible, // This is the toggle for visibility
             onSaved: (newValue) => password = newValue,
             onChanged: (value) {
               if (value.isNotEmpty) {
-                removeError(error: kPassNullError);
+                removeError(error: 'Password cannot be empty');
               } else if (value.length >= 8) {
-                removeError(error: kShortPassError);
+                removeError(error: 'Password is too short');
               }
               return;
             },
             validator: (value) {
               if (value!.isEmpty) {
-                addError(error: kPassNullError);
+                addError(error: 'Password cannot be empty');
                 return "";
               } else if (value.length < 8) {
-                addError(error: kShortPassError);
+                addError(error: 'Password is too short');
                 return "";
               }
               return null;
             },
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: "Password",
               hintText: "Enter your password",
-              // If  you are using latest version of flutter then lable text and hint text shown like this
-              // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isPasswordVisible =
+                        !_isPasswordVisible; // Toggle visibility
+                  });
+                },
+              ),
             ),
           ),
           const SizedBox(height: 20),
