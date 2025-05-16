@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'The Flutter Way - Template',
+      title: 'Smart Shop',
       theme: AppTheme.lightTheme(context),
       initialRoute: isRemembered ? InitScreen.routeName : SplashScreen.routeName,
       routes: routes,
