@@ -3,14 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:smartshopflutter/components/cache_manager.dart';
 import 'dart:io';
 
+import 'package:smartshopflutter/components/cache_manager.dart';
 import 'package:smartshopflutter/constants.dart';
 import 'package:smartshopflutter/helper/compress_image.dart';
 import 'package:smartshopflutter/models/Product.dart';
-import 'package:smartshopflutter/components/save_details.dart';
-import '../../../helper/permission.dart';
+import 'package:smartshopflutter/helper/permission.dart';
 
 class SellEditScreen extends StatefulWidget {
   static const String routeName = "/sell_edit";
@@ -31,6 +30,8 @@ class _SellEditScreenState extends State<SellEditScreen> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _stockController = TextEditingController();
+  final _categoryController = TextEditingController(); // ✅ New category controller
+
   bool _isPopular = false;
   List<String> _existingImages = [];
 
@@ -42,8 +43,9 @@ class _SellEditScreenState extends State<SellEditScreen> {
       _descriptionController.text = widget.product!.description;
       _priceController.text = widget.product!.price.toString();
       _stockController.text = widget.product!.stock.toString();
+      _categoryController.text = widget.product!.category ?? ''; // ✅ Load category
       _isPopular = widget.product!.isPopular;
-      _existingImages = widget.product!.images; // Load existing images
+      _existingImages = widget.product!.images;
     }
   }
 
@@ -70,33 +72,28 @@ class _SellEditScreenState extends State<SellEditScreen> {
 
     try {
       final productId = widget.product?.id;
-      List<String> imagePaths =
-          List.from(_existingImages); // Start with existing images
+      List<String> imagePaths = List.from(_existingImages);
 
       if (_image != null && _image!.isNotEmpty) {
         for (var image in _image!) {
           final compressedImage = await compressImage(image);
           if (compressedImage != null) {
-            final filePath =
-                'products/${DateTime.now().millisecondsSinceEpoch}.jpg';
+            final filePath = 'products/${DateTime.now().millisecondsSinceEpoch}.jpg';
             final storageRef = FirebaseStorage.instance.ref().child(filePath);
-            final uploadTask = storageRef.putFile(compressedImage);
-            await uploadTask;
-            imagePaths.add(filePath); // Add new images
+            await storageRef.putFile(compressedImage);
+            imagePaths.add(filePath);
           }
         }
       }
 
-      await FirebaseFirestore.instance
-          .collection('products')
-          .doc(productId)
-          .update({
+      await FirebaseFirestore.instance.collection('products').doc(productId).update({
         'title': _titleController.text,
         'description': _descriptionController.text,
         'price': double.tryParse(_priceController.text) ?? 0.0,
         'stock': int.tryParse(_stockController.text) ?? 0,
         'isPopular': _isPopular,
         'images': imagePaths,
+        'category': _categoryController.text.isEmpty ? null : _categoryController.text, // ✅ Add category
       });
 
       debugPrint("Product updated successfully!");
@@ -115,17 +112,13 @@ class _SellEditScreenState extends State<SellEditScreen> {
         } else if (snapshot.hasError || !snapshot.hasData) {
           return const Center(child: Icon(Icons.broken_image));
         } else {
-          final imageUrl = snapshot.data!;
           return CachedNetworkImage(
-            placeholder: (context, url) => const Center(
-              child: CircularProgressIndicator(),
-            ),
-            imageUrl: imageUrl,
-            cacheManager: CustomImageCacheManager.instance,
-            errorWidget: (context, url, error) =>
-                const Icon(Icons.broken_image),
+            imageUrl: snapshot.data!,
+            placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) => const Icon(Icons.broken_image),
             fit: BoxFit.cover,
-            cacheKey: imageUrl,
+            cacheManager: CustomImageCacheManager.instance,
+            cacheKey: snapshot.data!,
           );
         }
       },
@@ -164,17 +157,13 @@ class _SellEditScreenState extends State<SellEditScreen> {
                           : const Center(child: Text("Tap to pick image"))
                       : GridView.builder(
                           itemCount: _image!.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
                             crossAxisSpacing: 8.0,
                             mainAxisSpacing: 8.0,
                           ),
                           itemBuilder: (context, index) {
-                            return Image.file(
-                              _image![index],
-                              fit: BoxFit.cover,
-                            );
+                            return Image.file(_image![index], fit: BoxFit.cover);
                           },
                         ),
                 ),
@@ -187,8 +176,7 @@ class _SellEditScreenState extends State<SellEditScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _descriptionController,
-                decoration:
-                    const InputDecoration(labelText: "Product Description"),
+                decoration: const InputDecoration(labelText: "Product Description"),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -201,6 +189,11 @@ class _SellEditScreenState extends State<SellEditScreen> {
                 controller: _stockController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: "Stock Quantity"),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _categoryController,
+                decoration: const InputDecoration(labelText: "Category (optional)"), // ✅ Category field
               ),
               const SizedBox(height: 10),
               Row(

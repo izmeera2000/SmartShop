@@ -11,7 +11,8 @@ class Product {
   final bool isFavourite;
   final bool isPopular;
   final String userId;
-  final int stock; // ✅ Add stock field
+  final int stock;
+  final String? category; 
 
   Product({
     required this.id,
@@ -23,8 +24,10 @@ class Product {
     required this.isFavourite,
     required this.isPopular,
     required this.userId,
-    required this.stock, // ✅ Include in constructor
+    required this.stock,
+    this.category,  
   });
+
 
   // Optional: If you use color strings in Firestore
   static Color hexToColor(String hex) {

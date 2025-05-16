@@ -1,22 +1,28 @@
-Seller sell in the web , deliver packages to points 
-user go to points
-admin manage all
+%% products add category %%
+
+user register also add qr section
+
+chat for products
+
+
+chat for orders
+
+order list
 
 
 
-customer service
+
+order details
 
 
-seller can response
-
-
-seller can also buy item / become user
-
-
-notification in app
+admin settings >
+	address
+		catergoryies
+		deals
 
 
 
-payment system using manual QR
+user edit profile
 
-Flutter Firebase
+
+		

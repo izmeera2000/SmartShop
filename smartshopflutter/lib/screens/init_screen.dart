@@ -29,6 +29,8 @@ class _InitScreenState extends State<InitScreen> {
     });
   }
 
+  
+
   final pages = [
     const HomeScreen(),
     const SellListScreen(),

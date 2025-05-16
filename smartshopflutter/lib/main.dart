@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smartshopflutter/components/save_details.dart'; // Import save_details.dart
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,9 +21,9 @@ void main() async {
   await initializeFirebaseAppCheck();
 
   // Check if user is remembered, and navigate accordingly
-  bool isRemembered = await _checkRememberMe();
+bool remembered = await isRemembered();
 
-  runApp(MyApp(isRemembered: isRemembered));
+  runApp(MyApp(isRemembered: remembered));
 }
 
 Future<void> initializeFirebaseAppCheck() async {
@@ -56,11 +57,6 @@ Future<void> cacheAppCheckToken(String token) async {
 }
 
 
-// Check if the user should be auto-logged in
-Future<bool> _checkRememberMe() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('remember') ?? false;
-}
 
 class MyApp extends StatelessWidget {
   final bool isRemembered;

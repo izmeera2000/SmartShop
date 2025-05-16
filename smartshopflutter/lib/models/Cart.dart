@@ -29,52 +29,56 @@ Future<List<Cart>> fetchCartItemsFromFirestore(String userId) async {
 
       // Calculate the quantity from the cart document or default to 1
       final numOfItem = cartData['quantity'] ?? 1;
-
+      final category = cartData['category'] as String?;
       // Log the cart data for debugging
       debugPrint('cartData: $cartData');
 
-      if (productId != null) {
-        // Safely get each field from cartData using null-aware operators
-        final title = cartData['title'] ?? 'Unknown Title'; // Default value if null
-        final description = cartData['description'] ?? 'No description available';
+      // Safely get each field from cartData using null-aware operators
+      final title =
+          cartData['title'] ?? 'Unknown Title'; // Default value if null
+      final description =
+          cartData['description'] ?? 'No description available';
 
-        // Debugging: log the 'images' field and its type
-        debugPrint('images field: ${cartData['images']}');
-        debugPrint('images field type: ${cartData['images'].runtimeType}');
+      // Debugging: log the 'images' field and its type
+      debugPrint('images field: ${cartData['images']}');
+      debugPrint('images field type: ${cartData['images'].runtimeType}');
 
-        List<String> images = [];
-        if (cartData['images'] is List) {
-          images = List<String>.from(cartData['images']);
-        } else if (cartData['images'] != null) {
-          images = [cartData['images'].toString()];
-        }
-final stock = (cartData['stock'] as num?)?.toInt() ?? 0; // ✅ Default to 0 if null
-
-        final rating = (cartData['rating'] as num?)?.toDouble() ?? 0.0; // Default to 0.0 if null
-        final price = (cartData['price'] as num?)?.toDouble() ?? 0.00;  // Default to 0.0 if null
-        final isFavourite = cartData['isFavourite'] ?? false; // Default to false if null
-        final isPopular = cartData['isPopular'] ?? false;   // Default to false if null
-
-        // Create a Product object directly from the cart data
-    final product = Product(
-  id: productId,
-  title: title,
-  description: description,
-  images: images,
-  rating: rating,
-  price: price,
-  isFavourite: isFavourite,
-  isPopular: isPopular,
-  userId: cartData['userId'] ?? '', // User ID
-  stock: stock, // ✅ Add this line
-);
-
-        // Add the cart item to the cartItems list
-        cartItems.add(Cart(product: product, numOfItem: numOfItem));
-      } else {
-        debugPrint('Missing productId in cart data');
+      List<String> images = [];
+      if (cartData['images'] is List) {
+        images = List<String>.from(cartData['images']);
+      } else if (cartData['images'] != null) {
+        images = [cartData['images'].toString()];
       }
-    }
+      final stock =
+          (cartData['stock'] as num?)?.toInt() ?? 0; // ✅ Default to 0 if null
+
+      final rating = (cartData['rating'] as num?)?.toDouble() ??
+          0.0; // Default to 0.0 if null
+      final price = (cartData['price'] as num?)?.toDouble() ??
+          0.00; // Default to 0.0 if null
+      final isFavourite =
+          cartData['isFavourite'] ?? false; // Default to false if null
+      final isPopular =
+          cartData['isPopular'] ?? false; // Default to false if null
+
+      // Create a Product object directly from the cart data
+      final product = Product(
+        id: productId,
+        title: title,
+        description: description,
+        images: images,
+        rating: rating,
+        price: price,
+        isFavourite: isFavourite,
+        isPopular: isPopular,
+        userId: cartData['userId'] ?? '',
+        stock: stock,
+        category: category,
+      );
+
+      // Add the cart item to the cartItems list
+      cartItems.add(Cart(product: product, numOfItem: numOfItem));
+        }
 
     // Log the total number of items in the cart
     debugPrint('Total number of items in cart: ${cartItems.length}');

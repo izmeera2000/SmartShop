@@ -1,16 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../components/custom_surfix_icon.dart';
-import '../../../components/form_error.dart';
-import '../../../constants.dart';
-import '../../../helper/keyboard.dart';
-import '../../forgot_password/forgot_password_screen.dart';
-import '../../login_success/login_success_screen.dart';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:smartshopflutter/components/save_details.dart';
+ 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class SignForm extends StatefulWidget {
@@ -25,14 +19,13 @@ class _SignFormState extends State<SignForm> {
   String? email;
   String? password;
   bool _isPasswordVisible = false;
-  bool? remember = false;  // Remember me checkbox
+  bool remember = false; // default false
   final List<String?> errors = [];
 
   @override
   void initState() {
     super.initState();
-    _checkRememberMe();  // Check if user should be auto-logged in
-  }
+   }
 
   void addError({String? error}) {
     if (!errors.contains(error)) {
@@ -50,23 +43,8 @@ class _SignFormState extends State<SignForm> {
     }
   }
 
-  // Add this method to check the SharedPreferences for login details
-  void _checkRememberMe() async {
-    final prefs = await SharedPreferences.getInstance();
-    final bool isRemembered = prefs.getBool('remember') ?? false;
 
-    if (isRemembered) {
-      final String? storedEmail = prefs.getString('email');
-      final String? storedPassword = prefs.getString('password');
 
-      if (storedEmail != null && storedPassword != null) {
-        // Auto login if remember is checked
-        _signInWithEmailPassword(storedEmail, storedPassword);
-      }
-    }
-  }
-
-  // Auto login function
   Future<void> _signInWithEmailPassword(String email, String password) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -75,11 +53,17 @@ class _SignFormState extends State<SignForm> {
       );
 
       final user = userCredential.user;
-
       if (user != null) {
-        // Get FCM token after login
+        // Save user data for profile screen
+        await saveUserData(email: user.email!, uid: user.uid);
+
+        // Save login credentials for future auto-login if remember is checked
+        if (remember) {
+          await saveLoginCredentials(email: email, password: password, remember: true);
+        }
+
+        // Handle FCM token update
         String? token = await FirebaseMessaging.instance.getToken();
-        debugPrint("FCM Token: $token");
 
         if (token != null) {
           DocumentSnapshot userDoc = await FirebaseFirestore.instance
@@ -87,47 +71,39 @@ class _SignFormState extends State<SignForm> {
               .doc(user.uid)
               .get();
 
-          Map<String, dynamic> userData =
-              userDoc.data() as Map<String, dynamic>;
+          Map<String, dynamic> userData = userDoc.exists
+              ? userDoc.data() as Map<String, dynamic>
+              : {};
 
-          List<String> fcmTokens =
-              List.from(userData['fcmTokens'] ?? []);
+          List<String> fcmTokens = List<String>.from(userData['fcmTokens'] ?? []);
 
           if (!fcmTokens.contains(token)) {
             fcmTokens.add(token);
           }
 
-          await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
-            {
-              'email': user.email,
-              'uid': user.uid,
-              'lastLogin': FieldValue.serverTimestamp(),
-              'fcmTokens': fcmTokens,
-            },
-            SetOptions(merge: true),
-          );
-
-          debugPrint('✅ User data and FCM tokens saved to Firestore: ${user.uid}');
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .set({
+            'email': user.email,
+            'uid': user.uid,
+            'lastLogin': FieldValue.serverTimestamp(),
+            'fcmTokens': fcmTokens,
+          }, SetOptions(merge: true));
         }
 
-        // Navigate to success screen
+        // Navigate to success screen after login
         Navigator.pushNamedAndRemoveUntil(
           context,
-          LoginSuccessScreen.routeName,
-          (Route<dynamic> route) => false,
+          '/login_success', // update to your route
+          (route) => false,
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Authentication failed')),
+      );
     }
-  }
-
-  // Save user credentials in SharedPreferences
-  Future<void> _saveLoginDetails(String email, String password) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('remember', remember ?? false);
-    prefs.setString('email', email);
-    prefs.setString('password', password);
   }
 
   @override
@@ -136,46 +112,42 @@ class _SignFormState extends State<SignForm> {
       key: _formKey,
       child: Column(
         children: [
+          // Email input
           TextFormField(
             keyboardType: TextInputType.emailAddress,
             onSaved: (newValue) => email = newValue,
             onChanged: (value) {
               if (value.isNotEmpty) {
-                removeError(error: kEmailNullError);
-              } else if (emailValidatorRegExp.hasMatch(value)) {
-                removeError(error: kInvalidEmailError);
+                removeError(error: 'Email cannot be empty');
               }
+              // Add your email validation here if needed
             },
             validator: (value) {
-              if (value!.isEmpty) {
-                addError(error: kEmailNullError);
-                return "";
-              } else if (!emailValidatorRegExp.hasMatch(value)) {
-                addError(error: kInvalidEmailError);
+              if (value == null || value.isEmpty) {
+                addError(error: 'Email cannot be empty');
                 return "";
               }
+              // Add your email regex check here if needed
               return null;
             },
             decoration: const InputDecoration(
               labelText: "Email",
               hintText: "Enter your email",
-              floatingLabelBehavior: FloatingLabelBehavior.always,
-              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
             ),
           ),
           const SizedBox(height: 20),
+
+          // Password input
           TextFormField(
             obscureText: !_isPasswordVisible,
             onSaved: (newValue) => password = newValue,
             onChanged: (value) {
               if (value.isNotEmpty) {
                 removeError(error: 'Password cannot be empty');
-              } else if (value.length >= 8) {
-                removeError(error: 'Password is too short');
               }
             },
             validator: (value) {
-              if (value!.isEmpty) {
+              if (value == null || value.isEmpty) {
                 addError(error: 'Password cannot be empty');
                 return "";
               } else if (value.length < 8) {
@@ -187,7 +159,6 @@ class _SignFormState extends State<SignForm> {
             decoration: InputDecoration(
               labelText: "Password",
               hintText: "Enter your password",
-              floatingLabelBehavior: FloatingLabelBehavior.always,
               suffixIcon: IconButton(
                 icon: Icon(
                   _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
@@ -202,102 +173,34 @@ class _SignFormState extends State<SignForm> {
             ),
           ),
           const SizedBox(height: 20),
+
+          // Remember me checkbox
           Row(
             children: [
               Checkbox(
                 value: remember,
-                activeColor: const Color.fromARGB(255, 255, 0, 0),
                 onChanged: (value) {
                   setState(() {
-                    remember = value;
+                    remember = value ?? false;
                   });
                 },
               ),
               const Text("Remember me"),
-              const Spacer(),
-              GestureDetector(
-                onTap: () => Navigator.pushNamed(context, ForgotPasswordScreen.routeName),
-                child: const Text("Forgot Password", style: TextStyle()),
-              ),
             ],
           ),
-          FormError(errors: errors),
+
+          // Errors display (simple example)
+          if (errors.isNotEmpty)
+            ...errors.map((e) => Text(e ?? '', style: TextStyle(color: Colors.red))),
+
           const SizedBox(height: 16),
+
           ElevatedButton(
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                KeyboardUtil.hideKeyboard(context);
-
-                try {
-                  // Sign in the user
-                  final UserCredential userCredential =
-                      await _auth.signInWithEmailAndPassword(
-                    email: email!,
-                    password: password!,
-                  );
-
-                  final user = userCredential.user;
-
-                  if (user != null) {
-                    // Save login details if 'Remember me' is checked
-                    if (remember == true) {
-                      await _saveLoginDetails(email!, password!);
-                    }
-
-                    // Get FCM token after login
-                    String? token = await FirebaseMessaging.instance.getToken();
-                    debugPrint("FCM Token: $token");
-
-                    if (token != null) {
-                      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(user.uid)
-                          .get();
-
-                      Map<String, dynamic> userData =
-                          userDoc.data() as Map<String, dynamic>;
-
-                      List<String> fcmTokens =
-                          List.from(userData['fcmTokens'] ?? []);
-
-                      if (!fcmTokens.contains(token)) {
-                        fcmTokens.add(token);
-                      }
-
-                      await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
-                        {
-                          'email': user.email,
-                          'uid': user.uid,
-                          'lastLogin': FieldValue.serverTimestamp(),
-                          'fcmTokens': fcmTokens,
-                        },
-                        SetOptions(merge: true),
-                      );
-
-                      debugPrint('✅ User data and FCM tokens saved to Firestore: ${user.uid}');
-                    }
-
-                    // Navigate to success screen
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      LoginSuccessScreen.routeName,
-                      (Route<dynamic> route) => false,
-                    );
-                  }
-                } on FirebaseAuthException catch (e) {
-                  String errorMessage;
-                  if (e.code == 'user-not-found') {
-                    errorMessage = 'No user found for that email.';
-                  } else if (e.code == 'wrong-password') {
-                    errorMessage = 'Wrong password provided.';
-                  } else {
-                    errorMessage = e.message ?? 'Authentication failed';
-                  }
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(errorMessage)),
-                  );
+                if (email != null && password != null) {
+                  await _signInWithEmailPassword(email!, password!);
                 }
               }
             },
