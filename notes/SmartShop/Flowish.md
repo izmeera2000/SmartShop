@@ -15,12 +15,15 @@ order list
 order details
 
 
+delivery
+
+
 admin settings >
 	address
 		catergoryies
 		deals
 
-
+scroll to refresh
 
 user edit profile
 

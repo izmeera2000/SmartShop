@@ -5,27 +5,46 @@ import 'components/discount_banner.dart';
 import 'components/home_header.dart';
 import 'components/popular_product.dart';
 import 'components/special_offers.dart';
+import '../../repositories/products_repository.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   static String routeName = "/home";
 
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Future<void> _handleRefresh() async {
+    // Clear any cached data
+    ProductsRepository.clearCache();
+
+    // Force widget rebuild
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 16),
-          child: Column(
-            children: [
-              HomeHeader(),
-              DiscountBanner(),
-              Categories(),
-              SpecialOffers(),
-              SizedBox(height: 20),
-              PopularProducts(),
-              SizedBox(height: 20),
-            ],
+        child: RefreshIndicator(
+          onRefresh: _handleRefresh,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(), // Needed for RefreshIndicator to work
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: const Column(
+              children: [
+                HomeHeader(),
+                DiscountBanner(),
+                Categories(),
+                SpecialOffers(),
+                SizedBox(height: 20),
+                PopularProducts(),
+                SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

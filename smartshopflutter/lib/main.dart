@@ -35,6 +35,7 @@ Future<void> initializeFirebaseAppCheck() async {
       await FirebaseAppCheck.instance.activate(
         androidProvider: AndroidProvider.debug, // Use Play Integrity in production
       );
+      
       String? token = await FirebaseAppCheck.instance.getToken();
       await cacheAppCheckToken(token!);
       debugPrint("App Check Token: $token");

@@ -1,37 +1,25 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// lib/screens/sell/sell_list_screen.dart
+
 import 'package:flutter/material.dart';
-import 'package:smartshopflutter/components/save_details.dart';
-import 'package:smartshopflutter/models/Product.dart';
 import 'package:smartshopflutter/components/product_card.dart';
+import 'package:smartshopflutter/models/Product.dart';
+import 'package:smartshopflutter/repositories/products_repository.dart';
 import 'package:smartshopflutter/screens/sell/sell_edit_screen.dart';
-import 'package:smartshopflutter/screens/sell/sell_screen.dart'; // Import the upload screen
+import 'package:smartshopflutter/screens/sell/sell_screen.dart';
 
 class SellListScreen extends StatelessWidget {
   static const String routeName = "/sell_list";
-  const SellListScreen({Key? key})
-      : super(key: key); // ✅ make constructor const
-
-  Future<List<Product>> fetchProducts() async {
-    String? userId = await getUserID();
-
-    final snapshot = await FirebaseFirestore.instance
-        .collection('products')
-        .where('userId', isEqualTo: userId) // 🔥 filter by userId
-        .get();
-    return snapshot.docs
-        .map((doc) => Product.fromFirestore(doc.data(), doc.id))
-        .toList();
-  }
+  const SellListScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Product List")),
+      appBar: AppBar(title: const Text("Your Products")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<List<Product>>(
-          future: fetchProducts(),
-          builder: (context, snapshot) {
+          future: ProductsRepository.fetchUserProducts(),
+          builder: (ctx, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
@@ -44,17 +32,16 @@ class SellListScreen extends StatelessWidget {
             }
 
             return GridView.builder(
-              shrinkWrap: true,
               itemCount: products.length,
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              gridDelegate:
+                  const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 200,
                 childAspectRatio: 0.7,
                 mainAxisSpacing: 20,
                 crossAxisSpacing: 16,
               ),
-              itemBuilder: (context, index) {
-                final product = products[index];
-                // debugPrint(product.images[0]);
+              itemBuilder: (context, idx) {
+                final product = products[idx];
                 return ProductCard(
                   product: product,
                   onPress: () {
@@ -71,12 +58,11 @@ class SellListScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip: "Upload New Product",
+        child: const Icon(Icons.add),
         onPressed: () {
-          // Navigate to the Upload Product screen
           Navigator.pushNamed(context, SellScreen.routeName);
         },
-        child: const Icon(Icons.add),
-        tooltip: "Upload New Product",
       ),
     );
   }
