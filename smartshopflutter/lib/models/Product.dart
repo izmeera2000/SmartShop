@@ -44,7 +44,7 @@ class Product {
     }
   }
 
-  factory Product.fromFirestore(Map<String, dynamic> data, String docId) {
+factory Product.fromFirestore(Map<String, dynamic> data, String docId) {
     return Product(
       id: docId,
       title: data['title'] ?? 'Untitled',
@@ -55,7 +55,9 @@ class Product {
       isFavourite: data['isFavourite'] ?? false,
       isPopular: data['isPopular'] ?? false,
       userId: data['userId'] ?? '',
-      stock: (data['stock'] as num?)?.toInt() ?? 0, // ✅ Parse stock safely
+      stock: (data['stock'] as num?)?.toInt() ?? 0,
+      category: data['category'], // nullable String
     );
   }
+
 }

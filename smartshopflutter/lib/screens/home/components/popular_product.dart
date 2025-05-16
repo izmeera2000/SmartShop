@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:smartshopflutter/repositories/products_repository.dart';
-import 'package:smartshopflutter/components/product_card.dart';
 import 'package:smartshopflutter/models/Product.dart';
+import 'package:smartshopflutter/components/product_card.dart';
 import '../../details/details_screen.dart';
 import '../../products/products_screen.dart';
+
+import 'package:smartshopflutter/repositories/products_repository.dart';
 import 'section_title.dart';
 
 class PopularProducts extends StatelessWidget {
-  const PopularProducts({Key? key}) : super(key: key);
+  final Future<List<Product>> future;
+
+  const PopularProducts({Key? key, required this.future}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,23 +25,25 @@ class PopularProducts extends StatelessWidget {
             },
           ),
         ),
-
-        // Use a FutureBuilder against our cached repository:
         FutureBuilder<List<Product>>(
-          future: ProductsRepository.fetchPopularProducts(),
+          future: future,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return SizedBox(
+                height:  140,
+                child: const Center(child: CircularProgressIndicator()));
             }
             if (snapshot.hasError) {
               return Center(child: Text("Error: ${snapshot.error}"));
             }
+
             final products = snapshot.data ?? [];
             if (products.isEmpty) {
               return const Center(child: Text("No popular products found."));
             }
 
             return SingleChildScrollView(
+              key: const PageStorageKey<String>('popular_products_scroll'),
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(

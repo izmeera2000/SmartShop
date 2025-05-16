@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:smartshopflutter/screens/products/products_screen.dart'; // Import ProductsScreen
 
-import '../../cart/cart_screen.dart';
-import 'icon_btn_with_counter.dart';
 import 'search_field.dart';
 
-class HomeHeader extends StatelessWidget {
-  const HomeHeader({
-    Key? key,
-  }) : super(key: key);
+class HomeHeader extends StatefulWidget {
+  const HomeHeader({Key? key}) : super(key: key);
 
+  @override
+  _HomeHeaderState createState() => _HomeHeaderState();
+}
+
+class _HomeHeaderState extends State<HomeHeader> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -16,18 +18,20 @@ class HomeHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Expanded(child: SearchField()),
-          const SizedBox(width: 16),
-          // IconBtnWithCounter(
-          //   svgSrc: "assets/icons/Cart Icon.svg",
-          //   press: () => Navigator.pushNamed(context, CartScreen.routeName),
-          // ),
-          // const SizedBox(width: 8),
-          // IconBtnWithCounter(
-          //   svgSrc: "assets/icons/Bell.svg",
-          //   numOfitem: 3,
-          //   press: () {},
-          // ),
+          Expanded(
+            child: SearchField(
+              onSubmitted: (query) {
+                // Navigate to ProductsScreen with the search query as an argument
+                if (query.isNotEmpty) {
+                  Navigator.pushNamed(
+                    context,
+                    ProductsScreen.routeName,
+                    arguments: query, // Passing the search query as argument
+                  );
+                }
+              },
+            ),
+          ),
         ],
       ),
     );

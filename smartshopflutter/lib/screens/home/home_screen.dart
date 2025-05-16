@@ -6,6 +6,7 @@ import 'components/home_header.dart';
 import 'components/popular_product.dart';
 import 'components/special_offers.dart';
 import '../../repositories/products_repository.dart';
+import 'package:smartshopflutter/models/Product.dart';
 
 class HomeScreen extends StatefulWidget {
   static String routeName = "/home";
@@ -17,12 +18,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late Future<List<Product>> _popularProductsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _popularProductsFuture = ProductsRepository.fetchPopularProducts();
+  }
+
   Future<void> _handleRefresh() async {
-    // Clear any cached data
+    // Clear any cached data in repository
     ProductsRepository.clearCache();
-    print("refresing");
-    // Force widget rebuild
-    setState(() {});
+    // Refresh the future and rebuild widget
+    setState(() {
+      _popularProductsFuture = ProductsRepository.fetchPopularProducts();
+    });
   }
 
   @override
@@ -32,18 +42,17 @@ class _HomeScreenState extends State<HomeScreen> {
         child: RefreshIndicator(
           onRefresh: _handleRefresh,
           child: SingleChildScrollView(
-            physics:
-                const AlwaysScrollableScrollPhysics(), // Needed for RefreshIndicator to work
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(vertical: 16),
-            child: const Column(
+            child: Column(
               children: [
                 HomeHeader(),
                 DiscountBanner(),
                 Categories(),
                 SpecialOffers(),
-                SizedBox(height: 20),
-                PopularProducts(),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
+                PopularProducts(future: _popularProductsFuture),
+                const SizedBox(height: 20),
               ],
             ),
           ),

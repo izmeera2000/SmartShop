@@ -13,6 +13,14 @@ class CartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the image URL from the cart product
+    String imageUrl = cart.product.images.isNotEmpty
+        ? cart.product.images[0]  // Direct URL from the images list
+        : '';  // Default value if image URL is empty
+
+    // Print the image URL to the console
+    print('Image URL: $imageUrl');
+
     return Row(
       children: [
         SizedBox(
@@ -26,13 +34,11 @@ class CartCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
               ),
               child: CachedNetworkImage(
-                imageUrl: cart.product.images.isNotEmpty
-                    ? cart.product.images[0]  // Direct URL from the images list
-                    : '',  // Default value if image URL is empty
+                imageUrl: imageUrl,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => const CircularProgressIndicator(), // Placeholder while loading
                 errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 50), // Error icon if loading fails
-                cacheKey: cart.product.images.isNotEmpty ? cart.product.images[0] : null, // Cache image URL
+                cacheKey: imageUrl.isNotEmpty ? imageUrl : null, // Cache image URL
               ),
             ),
           ),
