@@ -97,7 +97,7 @@ class _SellEditScreenState extends State<SellEditScreen> {
       });
 
       debugPrint("Product updated successfully!");
-      Navigator.pop(context);
+                    Navigator.of(context).pop();
     } catch (e) {
       debugPrint("Error updating product: $e");
     }

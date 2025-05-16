@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _handleRefresh() async {
     // Clear any cached data
     ProductsRepository.clearCache();
-
+    print("refresing");
     // Force widget rebuild
     setState(() {});
   }
@@ -32,7 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: RefreshIndicator(
           onRefresh: _handleRefresh,
           child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(), // Needed for RefreshIndicator to work
+            physics:
+                const AlwaysScrollableScrollPhysics(), // Needed for RefreshIndicator to work
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: const Column(
               children: [

@@ -62,7 +62,7 @@ class ColorDot extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(right: 2),
       padding: const EdgeInsets.all(8),
-      height: 40,
+      height: 20,
       width: 40,
       decoration: BoxDecoration(
         color: Colors.transparent,

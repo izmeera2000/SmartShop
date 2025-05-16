@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cached_network_image/cached_network_image.dart';  // Import cached_network_image
+import 'package:cached_network_image/cached_network_image.dart'; // Import cached_network_image
+import 'package:smartshopflutter/components/cache_manager.dart';
 
 import '../../../constants.dart';
 import '../../../models/Product.dart';
@@ -21,11 +22,6 @@ class ProductImages extends StatefulWidget {
 class _ProductImagesState extends State<ProductImages> {
   int selectedImage = 0;
 
-  Future<String> getImageUrl(String path) async {
-    final storageRef = FirebaseStorage.instance.ref(path);
-    return await storageRef.getDownloadURL();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -34,26 +30,21 @@ class _ProductImagesState extends State<ProductImages> {
           width: 238,
           child: AspectRatio(
             aspectRatio: 1,
-            child: FutureBuilder<String>(
-              future: getImageUrl(widget.product.images[selectedImage]),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError || !snapshot.hasData) {
-                  return const Center(child: Icon(Icons.broken_image, size: 60));
-                } else {
-                  return ClipRRect(
-                    child: CachedNetworkImage(
-                      imageUrl: snapshot.data!,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 60),
-                         cacheKey:
-                          snapshot.data!, 
-                    ),
-                  );
-                }
-              },
+            child: ClipRRect(
+              child: CachedNetworkImage(
+                imageUrl: widget
+                    .product.images[selectedImage], // Directly use the URL
+                fit: BoxFit.cover,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => const Icon(
+                  Icons.broken_image,
+                  size: 60,
+                ),
+                cacheKey: widget
+                    .product.images[selectedImage], // Cache based on image URL
+              ),
             ),
           ),
         ),
@@ -69,7 +60,8 @@ class _ProductImagesState extends State<ProductImages> {
                   selectedImage = index;
                 });
               },
-              imageUrl: widget.product.images[index],
+              imageUrl: widget.product
+                  .images[index], // Pass the image URL to SmallProductImage
             ),
           ),
         ),
@@ -80,20 +72,15 @@ class _ProductImagesState extends State<ProductImages> {
 
 class SmallProductImage extends StatelessWidget {
   const SmallProductImage({
-    super.key,
+    Key? key,
     required this.isSelected,
     required this.press,
     required this.imageUrl,
-  });
+  }) : super(key: key);
 
   final bool isSelected;
   final VoidCallback press;
   final String imageUrl;
-
-  Future<String> getImageUrl(String path) async {
-    final storageRef = FirebaseStorage.instance.ref(path);
-    return await storageRef.getDownloadURL();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +89,6 @@ class SmallProductImage extends StatelessWidget {
       child: AnimatedContainer(
         duration: defaultDuration,
         margin: const EdgeInsets.only(right: 16),
-        // padding: const EdgeInsets.all(8),
         height: 48,
         width: 48,
         decoration: BoxDecoration(
@@ -112,28 +98,20 @@ class SmallProductImage extends StatelessWidget {
             color: kPrimaryColor.withOpacity(isSelected ? 1 : 0),
           ),
         ),
-        child: FutureBuilder<String>(
-          future: getImageUrl(imageUrl),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(strokeWidth: 2));
-            } else if (snapshot.hasError || !snapshot.hasData) {
-              return const Icon(Icons.broken_image, size: 24);
-            } else {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(
-                              10), //
-                child: CachedNetworkImage(
-                  imageUrl: snapshot.data!,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                  errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 24),
-                     cacheKey:
-                          snapshot.data!, 
-                ),
-              );
-            }
-          },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: CachedNetworkImage(
+            imageUrl: imageUrl, // Directly use the URL passed in
+            fit: BoxFit.cover,
+            placeholder: (context, url) => const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            errorWidget: (context, url, error) => const Icon(
+              Icons.broken_image,
+              size: 24,
+            ),
+            cacheKey: imageUrl, // Cache the image based on its URL
+          ),
         ),
       ),
     );

@@ -6,10 +6,15 @@ import 'package:smartshopflutter/models/Product.dart';
 import 'package:smartshopflutter/repositories/products_repository.dart';
 import '../details/details_screen.dart';
 
-class ProductsScreen extends StatelessWidget {
+class ProductsScreen extends StatefulWidget {
   static const String routeName = "/products";
   const ProductsScreen({Key? key}) : super(key: key);
 
+  @override
+  State<ProductsScreen> createState() => _ProductsScreenState();
+}
+
+class _ProductsScreenState extends State<ProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +26,8 @@ class ProductsScreen extends StatelessWidget {
             onPressed: () {
               // Force refresh
               ProductsRepository.clearCache();
-              (context as Element).reassemble();
+              setState(
+                  () {}); // Force the UI to rebuild and re-fetch from FutureBuilder
             },
           ),
         ],

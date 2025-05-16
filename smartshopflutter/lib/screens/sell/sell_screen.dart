@@ -32,49 +32,50 @@ class _SellScreenState extends State<SellScreen> {
 
   // Upload function (modified below)
 
-Future<void> uploadProduct() async {
-  if (_image == null ||
-      _titleController.text.isEmpty ||
-      _descriptionController.text.isEmpty ||
-      _priceController.text.isEmpty ||
-      _stockController.text.isEmpty) {
-    // ✅ Validate stock too
-    debugPrint("All fields are required!");
-    return;
-  }
+  Future<void> uploadProduct() async {
+    if (_image == null ||
+        _titleController.text.isEmpty ||
+        _descriptionController.text.isEmpty ||
+        _priceController.text.isEmpty ||
+        _stockController.text.isEmpty) {
+      // ✅ Validate stock too
+      debugPrint("All fields are required!");
+      return;
+    }
 
-  try {
-    String? userId = await getUserID();
-    List<String> imagePaths = [];
-    bool hasError = false;
+    try {
+      String? userId = await getUserID();
+      List<String> imagePaths = [];
+      bool hasError = false;
 
-    if (_image is List<File>) {
-      for (var image in _image!) {
-        try {
-          final compressedImage = await compressImage(image);
-          if (compressedImage == null) {
-            debugPrint("Error compressing image: $image");
-            hasError = true;  // Set flag if error happens during compression
-            break;  // Break the loop as we don't want to continue uploading
+      if (_image is List<File>) {
+        for (var image in _image!) {
+          try {
+            final compressedImage = await compressImage(image);
+            if (compressedImage == null) {
+              debugPrint("Error compressing image: $image");
+              hasError = true; // Set flag if error happens during compression
+              break; // Break the loop as we don't want to continue uploading
+            }
+
+            final filePath =
+                'products/${DateTime.now().millisecondsSinceEpoch}.jpg';
+            final storageRef = FirebaseStorage.instance.ref().child(filePath);
+            final uploadTask = storageRef.putFile(compressedImage);
+            await uploadTask;
+            imagePaths.add(filePath);
+          } catch (e) {
+            debugPrint("Error processing image: $e");
+            hasError = true; // Set flag if any error occurs during upload
+            break; // Stop the process on error
           }
-
-          final filePath = 'products/${DateTime.now().millisecondsSinceEpoch}.jpg';
-          final storageRef = FirebaseStorage.instance.ref().child(filePath);
-          final uploadTask = storageRef.putFile(compressedImage);
-          await uploadTask;
-          imagePaths.add(filePath);
-        } catch (e) {
-          debugPrint("Error processing image: $e");
-          hasError = true;  // Set flag if any error occurs during upload
-          break;  // Stop the process on error
         }
       }
-    }
 
-    if (hasError) {
-      debugPrint("Upload aborted due to image error");
-      return;  // Exit the function if an error occurs
-    }
+      if (hasError) {
+        debugPrint("Upload aborted due to image error");
+        return; // Exit the function if an error occurs
+      }
 
       final productData = {
         'title': _titleController.text,
@@ -87,25 +88,24 @@ Future<void> uploadProduct() async {
         'userId': userId,
       };
 
-    await FirebaseFirestore.instance.collection('products').add(productData);
+      await FirebaseFirestore.instance.collection('products').add(productData);
 
-    debugPrint("Product uploaded successfully!");
+      debugPrint("Product uploaded successfully!");
 
-    // Clear form fields
-    _titleController.clear();
-    _descriptionController.clear();
-    _priceController.clear();
-    _stockController.clear();
-    setState(() {
-      _image = null;
-      _isPopular = false;
-    });
-  } catch (e) {
-    debugPrint("Error uploading product: $e");
+      // Clear form fields
+      _titleController.clear();
+      _descriptionController.clear();
+      _priceController.clear();
+      _stockController.clear();
+      setState(() {
+        _image = null;
+        _isPopular = false;
+      });
+      Navigator.of(context).pop();
+    } catch (e) {
+      debugPrint("Error uploading product: $e");
+    }
   }
-}
-
-
 
   Future<void> pickImage() async {
     final picker = ImagePicker();
