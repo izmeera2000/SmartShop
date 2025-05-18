@@ -24,10 +24,10 @@ class ProfileMenu extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           side: BorderSide(
-            color: Colors.black, // Set the color of the outline
+            color: const Color.fromARGB(255, 0, 0, 0), // Set the color of the outline
             width: 1, // Set the width of the outline
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         ),
         onPressed: press,
         child: Row(
@@ -41,7 +41,7 @@ class ProfileMenu extends StatelessWidget {
             Expanded(child: Text(text)),
             const Icon(
               Icons.arrow_forward_ios,
-              color: Color.fromARGB(255, 255, 0, 0),
+              color: Color.fromARGB(255, 0, 0, 0),
             ),
           ],
         ),

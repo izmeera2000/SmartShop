@@ -70,14 +70,14 @@ class _ColorDotsState extends State<ColorDots> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Row(
         children: [
-          const SizedBox(width: 10),
+          const SizedBox(width: 15),
           Expanded(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[800],
+                backgroundColor: const Color.fromARGB(255, 0, 0, 0),
               ),
               onPressed: _startChat,
               child: const Text("Chat with Seller"),
@@ -123,7 +123,7 @@ class ColorDot extends StatelessWidget {
       height: 20,
       width: 40,
       decoration: BoxDecoration(
-        color: Colors.transparent,
+        color: const Color.fromARGB(0, 0, 0, 0),
         border:
             Border.all(color: isSelected ? kPrimaryColor : Colors.transparent),
         shape: BoxShape.circle,

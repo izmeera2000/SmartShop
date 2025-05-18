@@ -24,7 +24,7 @@ class CartCard extends StatelessWidget {
     return Row(
       children: [
         SizedBox(
-          width: 70,
+          width: 88,
           child: AspectRatio(
             aspectRatio: 0.88,
             child: Container(
@@ -57,7 +57,7 @@ class CartCard extends StatelessWidget {
               TextSpan(
                 text: "RM${cart.product.price.toStringAsFixed(2)}", // Price of product
                 style: const TextStyle(
-                    fontWeight: FontWeight.w600, color: kPrimaryColor),
+                    fontWeight: FontWeight.w600, color: Color.fromARGB(255, 0, 0, 0)),
                 children: [
                   TextSpan(
                       text: " x${cart.numOfItem}", // Quantity of product in cart

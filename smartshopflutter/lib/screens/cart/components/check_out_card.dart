@@ -31,7 +31,7 @@ class CheckoutCard extends StatelessWidget {
           BoxShadow(
             offset: const Offset(0, -15),
             blurRadius: 20,
-            color: const Color(0xFFDADADA).withOpacity(0.15),
+            color: const Color.fromARGB(255, 43, 41, 41).withOpacity(0.15),
           )
         ],
       ),

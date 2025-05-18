@@ -99,13 +99,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           color: Colors.grey[50],
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: selectedIndex == index ? const Color.fromARGB(255, 255, 0, 0) : Colors.transparent,
+                            color: selectedIndex == index ? const Color.fromARGB(255, 0, 0, 0) : Colors.transparent,
                             width: 2,
                           ),
                         ),
-                        width: MediaQuery.of(context).size.width * 0.6,
+                        width: MediaQuery.of(context).size.width * 0.7,
                         margin: const EdgeInsets.symmetric(horizontal: 10),
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(10.0),
                         child: Text(deliveryAddresses[index]),
                       ),
                     );
@@ -137,7 +137,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             background: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 20),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFFE6E6),
+                                color: const Color.fromARGB(255, 31, 81, 21),
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: Row(
