@@ -27,30 +27,30 @@ class ProductsRepository {
     return _allProducts!;
   }
 
-  /// Fetch only the **popular** products, excluding current user.
-  static Future<List<Product>> fetchPopularProducts() async {
-    if (_popularProducts != null) return _popularProducts!;
+static Future<List<Product>> fetchPopularProducts() async {
+  if (_popularProducts != null) return _popularProducts!;
 
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    Query<Map<String, dynamic>> query = FirebaseFirestore.instance
-        .collection('products')
-        .where('isPopular', isEqualTo: true);
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  Query<Map<String, dynamic>> query = FirebaseFirestore.instance
+      .collection('products')
+      .where('isPopular', isEqualTo: true);
 
-    // Optionally do client‐side filter if you don’t want to index userId !=
-    if (uid != null) query = query.where('userId', isNotEqualTo: uid);
+  // Fetch the popular products, filter by isPopular
+  final snap = await query.get();
 
-    final snap = await query.get();
+  // If UID exists, filter out the current user's products manually
+  if (uid != null) {
+    final filteredDocs = snap.docs.where((doc) {
+      return doc['userId'] != uid;
+    }).toList();
+
+    _popularProducts = await _resolveDocs(filteredDocs);
+  } else {
     _popularProducts = await _resolveDocs(snap.docs);
-
-    // If you couldn’t apply the isNotEqualTo filter server-side, do:
-    // if (uid != null) {
-    //   _popularProducts =
-    //     _popularProducts!.where((p) => p.userId != uid).toList();
-    // }
-
-    return _popularProducts!;
   }
 
+  return _popularProducts!;
+}
   /// Fetch only the **current user’s** products.
   static Future<List<Product>> fetchUserProducts() async {
     if (_userProducts != null) return _userProducts!;

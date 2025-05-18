@@ -1,6 +1,6 @@
 %% products add category %%
 
-user register also add qr section
+%% user register also add qr section %%
 
 chat for products
 
@@ -23,9 +23,9 @@ admin settings >
 		catergoryies
 		deals
 
-scroll to refresh
+%% scroll to refresh %%
 
-user edit profile
+%% user edit profile %%
 
 
 		

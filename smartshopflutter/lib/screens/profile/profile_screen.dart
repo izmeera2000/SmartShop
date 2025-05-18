@@ -1,104 +1,118 @@
 import 'package:flutter/material.dart';
 import 'package:smartshopflutter/routes.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:smartshopflutter/components/save_details.dart'; // Import save_details.dart
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smartshopflutter/screens/chat/chat_list_screen.dart';
 
 import 'components/profile_menu.dart';
 import 'components/profile_pic.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
+import 'package:smartshopflutter/screens/profile/edit_profile.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   static String routeName = "/profile";
 
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String? userEmail;
+  String? profileImageUrl;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserEmail();
+  }
+
+  Future<void> _loadUserEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('userEmail') ?? 'Guest';
+    final imageUrl = prefs.getString('profileImage') ?? '';
+    print(imageUrl);
+    if (mounted) {
+      setState(() {
+        userEmail = email;
+        profileImageUrl = imageUrl.isNotEmpty ? imageUrl : null;
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: getUserEmail(), // Retrieve saved email from SharedPreferences
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            appBar: AppBar(
-              // title: const Text("Profile"),
+    return Scaffold(
+      appBar: AppBar(
+        // title: const Text("Profile"),
+      ),
+      body: RefreshIndicator(
+        onRefresh: _loadUserEmail, // Trigger the refresh method
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          children: [
+            Column(
+              children: [
+                ProfilePic(imageUrl: profileImageUrl),
+                const SizedBox(height: 20),
+                isLoading
+                    ? const CircularProgressIndicator()
+                    : Text(
+                        userEmail ?? "Guest",
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                const SizedBox(height: 20),
+                ProfileMenu(
+                  text: "My Account",
+                  icon: "assets/icons/User Icon.svg",
+                  press: () {
+                    Navigator.pushNamed(context, EditProfileScreen.routeName);
+                  },
+                ),
+                                ProfileMenu(
+                  text: "Orders",
+                  icon: "assets/icons/Chat bubble Icon.svg",
+                  press: () {},
+                ),
+                ProfileMenu(
+                  text: "Chats",
+                  icon: "assets/icons/Chat bubble Icon.svg",
+                  press: () {
+                    Navigator.pushNamed(context, ChatListScreen.routeName);
+
+                  },
+                ),
+                ProfileMenu(
+                  text: "Settings",
+                  icon: "assets/icons/Settings.svg",
+                  press: () {},
+                ),
+                ProfileMenu(
+                  text: "Help Center",
+                  icon: "assets/icons/Question mark.svg",
+                  press: () {},
+                ),
+                ProfileMenu(
+                  text: "Log Out",
+                  icon: "assets/icons/Log out.svg",
+                  press: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.clear();
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, "/sign_in", (route) => false);
+                  },
+                ),
+              ],
             ),
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        if (snapshot.hasData) {
-          String userEmail = snapshot.data ?? "Guest";
-
-          return Scaffold(
-            appBar: AppBar(
-              // title: const Text("Profile"),
-            ),
-            body: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Column(
-                children: [
-                  const ProfilePic(),
-                  const SizedBox(height: 20),
-                  Text(userEmail, // Display the email retrieved from SharedPreferences
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      )),
-                  const SizedBox(height: 20),
-
-                  ProfileMenu(
-                    text: "My Account",
-                    icon: "assets/icons/User Icon.svg",
-                    press: () => {},
-                  ),
-                  ProfileMenu(
-                    text: "Notifications",
-                    icon: "assets/icons/Bell.svg",
-                    press: () {},
-                  ),
-                  ProfileMenu(
-                    text: "Settings",
-                    icon: "assets/icons/Settings.svg",
-                    press: () {},
-                  ),
-                  ProfileMenu(
-                    text: "Help Center",
-                    icon: "assets/icons/Question mark.svg",
-                    press: () {},
-                  ),
-                  ProfileMenu(
-                    text: "Log Out",
-                    icon: "assets/icons/Log out.svg",
-                    press: () async {
-                      // Clear SharedPreferences
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.clear(); // Clear all stored data
-
-                      // Sign out the user
-                      await FirebaseAuth.instance.signOut();
-
-                      // Redirect to sign-in screen after logout
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        "/sign_in", // Sign-in screen route
-                        (route) => false, // Remove all routes from the stack
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("Profile"),
-            ),
-            body: Center(child: Text("Failed to load user data.")),
-          );
-        }
-      },
+          ],
+        ),
+      ),
     );
   }
 }

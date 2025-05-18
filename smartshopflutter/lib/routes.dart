@@ -1,7 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:smartshopflutter/models/Product.dart';
+import 'package:smartshopflutter/screens/chat/chat_list_screen.dart';
+import 'package:smartshopflutter/screens/chat/chat_screen.dart';
 import 'package:smartshopflutter/screens/payment/payment_screen.dart';
 import 'package:smartshopflutter/screens/products/products_screen.dart';
+import 'package:smartshopflutter/screens/profile/edit_profile.dart';
 
 import 'screens/cart/cart_screen.dart';
 import 'screens/complete_profile/complete_profile_screen.dart';
@@ -38,10 +41,18 @@ final Map<String, WidgetBuilder> routes = {
   CheckoutScreen.routeName: (context) => const CheckoutScreen(),
   PaymentScreen.routeName: (context) => const PaymentScreen(),
   ProfileScreen.routeName: (context) => const ProfileScreen(),
+  EditProfileScreen.routeName: (context) => const EditProfileScreen(),
   SellScreen.routeName: (context) => const SellScreen(),
   SellListScreen.routeName: (context) => const SellListScreen(),
   SellEditScreen.routeName: (context) {
     final args = ModalRoute.of(context)!.settings.arguments as Product?;
     return SellEditScreen(product: args);
+  },
+  ChatListScreen.routeName: (context) => const ChatListScreen(),
+  ChatScreen.routeName: (context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+    final chatId = args['chatId']!;
+    final otherUserId = args['otherUserId']!;
+    return ChatScreen(chatId: chatId, otherUserId: otherUserId);
   },
 };
