@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:smartshopflutter/components/save_details.dart';
+import 'package:smartshopflutter/screens/forgot_password/forgot_password_screen.dart';
  
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -186,6 +187,12 @@ class _SignFormState extends State<SignForm> {
                 },
               ),
               const Text("Remember me"),
+               const Spacer(),
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(
+                    context, ForgotPasswordScreen.routeName),
+                child: const Text("Forgot Password", style: TextStyle()),
+              )
             ],
           ),
 

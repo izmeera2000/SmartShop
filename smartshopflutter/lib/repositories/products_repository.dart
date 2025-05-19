@@ -57,6 +57,7 @@ static Future<List<Product>> fetchPopularProducts() async {
 
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return [];
+    print(uid);
 
     final snap = await FirebaseFirestore.instance
         .collection('products')

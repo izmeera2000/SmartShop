@@ -50,6 +50,7 @@ class _CartScreenState extends State<CartScreen> {
       rawPaths
           .map((path) => FirebaseStorage.instance.ref(path).getDownloadURL()),
     );
+    
     data['images'] = downloadUrls;
     return Product.fromFirestore(data, doc.id);
   }

@@ -28,4 +28,8 @@ admin settings >
 %% user edit profile %%
 
 
+adjust refresh on startup
+
+
+
 		

@@ -3,6 +3,8 @@ import 'package:smartshopflutter/routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartshopflutter/screens/chat/chat_list_screen.dart';
+import 'package:smartshopflutter/screens/orders/orders_list_seller.dart';
+import 'package:smartshopflutter/screens/orders/orders_list_user.dart';
 
 import 'components/profile_menu.dart';
 import 'components/profile_pic.dart';
@@ -46,8 +48,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: const Text("Profile"),
-      ),
+          // title: const Text("Profile"),
+          ),
       body: RefreshIndicator(
         onRefresh: _loadUserEmail, // Trigger the refresh method
         child: ListView(
@@ -74,17 +76,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.pushNamed(context, EditProfileScreen.routeName);
                   },
                 ),
-                                ProfileMenu(
+                ProfileMenu(
                   text: "Orders",
                   icon: "assets/icons/Chat bubble Icon.svg",
-                  press: () {},
+                  press: () {
+                    Navigator.pushNamed(context, OrdersListUser.routeName);
+                  },
+                ),
+                      ProfileMenu(
+                  text: "Orders Seller",
+                  icon: "assets/icons/Chat bubble Icon.svg",
+                  press: () {
+                    Navigator.pushNamed(context, OrdersListSeller.routeName);
+                  },
                 ),
                 ProfileMenu(
                   text: "Chats",
                   icon: "assets/icons/Chat bubble Icon.svg",
                   press: () {
                     Navigator.pushNamed(context, ChatListScreen.routeName);
-
                   },
                 ),
                 ProfileMenu(

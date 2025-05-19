@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smartshopflutter/constants.dart';
+import 'package:smartshopflutter/repositories/products_repository.dart';
 import 'package:smartshopflutter/screens/favorite/favorite_screen.dart';
 import 'package:smartshopflutter/screens/home/home_screen.dart';
 import 'package:smartshopflutter/screens/profile/profile_screen.dart';
@@ -28,6 +29,13 @@ class _InitScreenState extends State<InitScreen> {
       currentSelectedIndex = index;
     });
   }
+
+@override
+void initState() {
+  super.initState();
+  ProductsRepository.clearCache(); // clear cache at app start
+  // then load products
+}
 
   final pages = [
     const HomeScreen(),

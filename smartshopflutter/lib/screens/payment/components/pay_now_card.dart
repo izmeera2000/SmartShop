@@ -63,8 +63,7 @@ class PaidCard extends StatelessWidget {
             //   ],
             // ),
             const SizedBox(height: 16),
-
-            Row(
+             Row(
               children: [
                 // Expanded(
                 //   child: Text.rich(

@@ -105,7 +105,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     },
                   ),
                 ),
-                
               ],
             ),
           ),
@@ -117,63 +116,90 @@ class _DetailsScreenState extends State<DetailsScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: ElevatedButton(
-              onPressed: _isAddingToCart ? null : () async {
-                setState(() {
-                  _isAddingToCart = true;
-                });
+              onPressed: _isAddingToCart
+                  ? null
+                  : () async {
+                      setState(() {
+                        _isAddingToCart = true;
+                      });
 
-                try {
-                  String? userId = await getUserID();
-                  if (userId == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please login to add items to your cart')),
-                    );
-                    setState(() {
-                      _isAddingToCart = false;
-                    });
-                    return;
-                  }
+                      try {
+                        String? userId = await getUserID();
+                        if (userId == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Please login to add items to your cart')),
+                          );
+                          setState(() {
+                            _isAddingToCart = false;
+                          });
+                          return;
+                        }
 
-                  FirebaseFirestore firestore = FirebaseFirestore.instance;
-                  var cartRef = firestore.collection('users').doc(userId).collection('cart').doc(product.id);
-                  DocumentSnapshot cartSnapshot = await cartRef.get();
+                        FirebaseFirestore firestore =
+                            FirebaseFirestore.instance;
+                        var cartRef = firestore
+                            .collection('users')
+                            .doc(userId)
+                            .collection('cart')
+                            .doc(product.id);
+                        DocumentSnapshot cartSnapshot = await cartRef.get();
 
-                  if (cartSnapshot.exists) {
-                    int currentQuantity = cartSnapshot.get('quantity') ?? 0;
-                    await cartRef.update({'quantity': currentQuantity + quantity});
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Quantity updated to ${currentQuantity + quantity}')),
-                    );
-                  } else {
-                    Map<String, dynamic> cartItem = {
-                      'productId': product.id,
-                      'title': product.title,
-                      'price': product.price,
-                      'images': product.images.isNotEmpty ? product.images : [],
-                      'quantity': quantity,
-                    };
-                    await cartRef.set(cartItem);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Added $quantity item(s) to cart')),
-                    );
-                  }
+                        if (cartSnapshot.exists) {
+                          int currentQuantity =
+                              cartSnapshot.get('quantity') ?? 0;
+                          await cartRef
+                              .update({'quantity': currentQuantity + quantity});
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Quantity updated to ${currentQuantity + quantity}')),
+                          );
+                        } else {
+                          Map<String, dynamic> cartItem = {
+                            'productId': product.id,
+                            'title': product.title,
+                            'price': product.price,
+                            'images':
+                                product.images.isNotEmpty ? product.images : [],
+                            'quantity': quantity,
+                            'userId': product.userId, // ← ADD THIS
+                            'category': product.category ??
+                                '', // optional, if you need it
+                            'stock': product.stock, // optional
+                            'rating': product.rating, // optional
+                            'isFavourite': product.isFavourite, // optional
+                            'isPopular': product.isPopular, // optional
+                          };
 
-                  Navigator.of(context).pop();
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to add/update product in cart: $e')),
-                  );
-                } finally {
-                  setState(() {
-                    _isAddingToCart = false;
-                  });
-                }
-              },
+                          await cartRef.set(cartItem);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text('Added $quantity item(s) to cart')),
+                          );
+                        }
+
+                        Navigator.of(context).pop();
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  'Failed to add/update product in cart: $e')),
+                        );
+                      } finally {
+                        setState(() {
+                          _isAddingToCart = false;
+                        });
+                      }
+                    },
               child: _isAddingToCart
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2),
                     )
                   : const Text("Add To Cart"),
             ),
@@ -188,5 +214,3 @@ class ProductDetailsArguments {
   final Product product;
   ProductDetailsArguments({required this.product});
 }
-
- 

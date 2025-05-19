@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:smartshopflutter/screens/payment/payment_screen.dart';
-import '../../../constants.dart';
-import '../../../models/Cart.dart';
-import '../../../models/Order.dart'; // Ensure this is the correct import
-import '../../../components/save_details.dart';
+import 'package:smartshopflutter/models/Order.dart';
+import 'package:smartshopflutter/models/Cart.dart';
+import 'package:smartshopflutter/components/save_details.dart';
+import 'package:smartshopflutter/screens/payment/payment_screen.dart'; // For getUserID()
 
 class PayNowCard extends StatelessWidget {
   final double totalPrice;
@@ -31,19 +30,29 @@ class PayNowCard extends StatelessWidget {
       return;
     }
 
-    // Create OrderItem objects from cartItems
+    // Convert cart items to order items
     List<OrderItem> orderItems = cartItems.map((item) {
       return OrderItem(
         productId: item.product.id,
         title: item.product.title,
         price: item.product.price,
         quantity: item.numOfItem,
+        productUserId: item.product.userId,
+        status: 'pending',
       );
     }).toList();
 
-    // Create Order object
+    // Get unique sellerIds from the order items
+    List<String> sellerIds =
+        orderItems.map((item) => item.productUserId).toSet().toList();
+
+    // Add per-seller status map (default "pending")
+    Map<String, String> sellerStatus = {
+      for (var sellerId in sellerIds) sellerId: 'pending'
+    };
+
     final order = Orders(
-      id: '', // Firestore will assign the ID
+      id: '',
       userId: userId,
       deliveryAddress: selectedAddress,
       totalPrice: totalPrice,
@@ -54,31 +63,35 @@ class PayNowCard extends StatelessWidget {
       items: orderItems,
     );
 
-    // Save the order to Firestore
-    await FirebaseFirestore.instance.collection('orders').add(order.toMap());
+    // Convert order to map and inject sellerIds and sellerStatus
+    final orderMap = order.toMap();
+    orderMap['sellerIds'] = sellerIds;
+    orderMap['sellerStatus'] = sellerStatus;
 
-    // 2. Remove items from the cart
+    // Save order
+    final orderRef =
+        await FirebaseFirestore.instance.collection('orders').add(orderMap);
+
+    // Clear user's cart
     final cartRef = FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
         .collection('cart');
-
     final cartDocs = await cartRef.get();
     for (var doc in cartDocs.docs) {
       await doc.reference.delete();
     }
 
-    // 3. Clear local cart + show feedback
     onOrderComplete();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Order placed and cart cleared!")),
+      SnackBar(content: Text("Order placed!")),
     );
 
-    // 4. Navigate to payment
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(builder: (context) => PaymentScreen()),
+      PaymentScreen.routeName,
+      arguments: {'orderId': orderRef.id},
     );
   }
 
@@ -109,7 +122,7 @@ class PayNowCard extends StatelessWidget {
                   text: "Total:\n",
                   children: [
                     TextSpan(
-                      text: "\RM${totalPrice.toStringAsFixed(2)}",
+                      text: "RM${totalPrice.toStringAsFixed(2)}",
                       style: const TextStyle(fontSize: 16, color: Colors.black),
                     ),
                   ],

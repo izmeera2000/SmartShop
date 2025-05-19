@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart'; // Add this if not already imported
 import 'package:cached_network_image/cached_network_image.dart'; // Import cached_network_image
 import '../../../constants.dart';
 import '../../../models/Cart.dart';
@@ -12,17 +11,20 @@ class CartCard extends StatelessWidget {
 
   final Cart cart;
 
-  Future<String> getImageUrl(String path) async {
-    final storageRef = FirebaseStorage.instance.ref(path);
-    return await storageRef.getDownloadURL();
-  }
-
   @override
   Widget build(BuildContext context) {
+    // Get the image URL from the cart product
+    String imageUrl = cart.product.images.isNotEmpty
+        ? cart.product.images[0]  // Direct URL from the images list
+        : '';  // Default value if image URL is empty
+
+    // Print the image URL to the console
+    print('Image URL: $imageUrl');
+
     return Row(
       children: [
         SizedBox(
-          width: 70,
+          width: 88,
           child: AspectRatio(
             aspectRatio: 0.88,
             child: Container(
@@ -31,25 +33,12 @@ class CartCard extends StatelessWidget {
                 color: const Color(0xFFF5F6F9),
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: FutureBuilder<String>(
-                future: getImageUrl(cart.product.images[0]),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(strokeWidth: 2));
-                  } else if (snapshot.hasError || !snapshot.hasData) {
-                    return const Icon(Icons.broken_image, size: 50);
-                  } else {
-                    // Use CachedNetworkImage instead of Image.network
-                    return CachedNetworkImage(
-                      imageUrl: snapshot.data!,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 50),
-                         cacheKey:
-                          snapshot.data!, 
-                    );
-                  }
-                },
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => const CircularProgressIndicator(), // Placeholder while loading
+                errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 50), // Error icon if loading fails
+                cacheKey: imageUrl.isNotEmpty ? imageUrl : null, // Cache image URL
               ),
             ),
           ),
@@ -61,23 +50,23 @@ class CartCard extends StatelessWidget {
             Text(
               cart.product.title,
               style: const TextStyle(color: Colors.black, fontSize: 16),
-              maxLines: 2,
+              maxLines: 2, // Limit title to two lines
             ),
             const SizedBox(height: 8),
             Text.rich(
               TextSpan(
-                text: "\RM${cart.product.price}",
+                text: "RM${cart.product.price.toStringAsFixed(2)}", // Price of product
                 style: const TextStyle(
                     fontWeight: FontWeight.w600, color: Color.fromARGB(255, 0, 0, 0)),
                 children: [
                   TextSpan(
-                      text: " x${cart.numOfItem}",
+                      text: " x${cart.numOfItem}", // Quantity of product in cart
                       style: Theme.of(context).textTheme.bodyLarge),
                 ],
               ),
-            )
+            ),
           ],
-        )
+        ),
       ],
     );
   }

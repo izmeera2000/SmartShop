@@ -1,7 +1,12 @@
 import 'package:flutter/widgets.dart';
+import 'package:smartshopflutter/models/Cart.dart';
 import 'package:smartshopflutter/models/Product.dart';
 import 'package:smartshopflutter/screens/chat/chat_list_screen.dart';
 import 'package:smartshopflutter/screens/chat/chat_screen.dart';
+import 'package:smartshopflutter/screens/orders/orders_details_seller.dart';
+import 'package:smartshopflutter/screens/orders/orders_details_user.dart';
+import 'package:smartshopflutter/screens/orders/orders_list_seller.dart';
+import 'package:smartshopflutter/screens/orders/orders_list_user.dart';
 import 'package:smartshopflutter/screens/payment/payment_screen.dart';
 import 'package:smartshopflutter/screens/products/products_screen.dart';
 import 'package:smartshopflutter/screens/profile/edit_profile.dart';
@@ -39,7 +44,26 @@ final Map<String, WidgetBuilder> routes = {
   DetailsScreen.routeName: (context) => const DetailsScreen(),
   CartScreen.routeName: (context) => const CartScreen(),
   CheckoutScreen.routeName: (context) => const CheckoutScreen(),
-  PaymentScreen.routeName: (context) => const PaymentScreen(),
+  PaymentScreen.routeName: (context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+    final orderId = args['orderId']!;
+    return PaymentScreen(orderId: orderId);
+  },
+  OrdersListUser.routeName: (context) => const OrdersListUser(),
+  OrderDetailsUser.routeName: (context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+    final orderId = args['orderId']!;
+    return OrderDetailsUser(orderId: orderId);
+  },
+  OrdersListSeller.routeName: (context) => const OrdersListSeller(),
+    OrderDetailsSeller.routeName: (context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+    final orderId = args['orderId']!;
+    return OrderDetailsSeller(orderId: orderId);
+  },
   ProfileScreen.routeName: (context) => const ProfileScreen(),
   EditProfileScreen.routeName: (context) => const EditProfileScreen(),
   SellScreen.routeName: (context) => const SellScreen(),
@@ -50,7 +74,8 @@ final Map<String, WidgetBuilder> routes = {
   },
   ChatListScreen.routeName: (context) => const ChatListScreen(),
   ChatScreen.routeName: (context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, String>;
     final chatId = args['chatId']!;
     final otherUserId = args['otherUserId']!;
     return ChatScreen(chatId: chatId, otherUserId: otherUserId);

@@ -1,130 +1,221 @@
+// payment_screen.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:smartshopflutter/constants.dart';
-import '../../models/Cart.dart';
-import '../../models/Product.dart';
+import '../../models/Order.dart';
 import 'components/pay_now_card.dart';
-import 'package:smartshopflutter/components/save_details.dart'; // Assuming this is where getUserID() is defined.
 
 class PaymentScreen extends StatefulWidget {
-  static String routeName = "/payment";
-  const PaymentScreen({super.key});
+  static const String routeName = "/payment";
+  final String orderId;
+
+  const PaymentScreen({Key? key, required this.orderId}) : super(key: key);
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  List<Cart> cartItems = [];
+  Orders? order;
+  Map<String, String?> sellerBankImages = {};
   bool isLoading = true;
-  int selectedIndex = -1; // Store selected index for outlining effect
 
   @override
   void initState() {
     super.initState();
-    // Fetch the user ID first
-    getUserID().then((userId) {
-      if (userId != null) {
-        debugPrint('User ID retrieved: $userId'); // Logging user ID
-        loadCartFromFirestore(userId);
-      } else {
-        debugPrint("User ID is null, please log in.");
+    _loadOrderAndBankImages();
+  }
+
+  Future<void> _loadOrderAndBankImages() async {
+    if (widget.orderId.trim().isEmpty) {
+      debugPrint('Error: orderId is empty');
+      setState(() => isLoading = false);
+      return;
+    }
+
+    final doc = await FirebaseFirestore.instance
+        .collection('orders')
+        .doc(widget.orderId)
+        .get();
+
+    if (!doc.exists || doc.data() == null) {
+      debugPrint('Order document does not exist!');
+      setState(() => isLoading = false);
+      return;
+    }
+
+    // Ensure items is always a List<Map>
+    final data = doc.data()!;
+    final rawItems = data['items'] as List<dynamic>? ?? [];
+    final itemsList = rawItems
+        .map((e) => OrderItem.fromMap(Map<String, dynamic>.from(e)))
+        .toList();
+
+    // Build Orders model
+    order = Orders(
+      id: doc.id,
+      userId: data['userId'] as String? ?? '',
+      deliveryAddress: data['deliveryAddress'] as String? ?? '',
+      totalPrice: (data['totalPrice'] as num?)?.toDouble() ?? 0.0,
+      status: data['status'] as String? ?? '',
+      notes: data['notes'] as String? ?? '',
+      date: DateTime.tryParse(data['date'] as String? ?? '') ?? DateTime.now(),
+      estimatedDeliveryDate: DateTime.tryParse(
+            data['estimatedDeliveryDate'] as String? ?? '',
+          ) ??
+          DateTime.now(),
+      items: itemsList,
+    );
+
+    // Fetch each seller's bankImageUrl
+    final sellerIds = order!.items
+        .map((i) => i.productUserId)
+        .where((id) => id.trim().isNotEmpty)
+        .toSet();
+
+    for (var sid in sellerIds) {
+      if (sid.trim().isEmpty) {
+        continue;
       }
-    });
-  }
 
-  Future<void> loadCartFromFirestore(String userId) async {
-    debugPrint('Loading cart for user: $userId'); // Logging cart load attempt
-    final items = await fetchCartItemsFromFirestore(userId);
-    debugPrint(
-        'Cart items loaded: ${items.length} items'); // Logging number of items loaded
-    setState(() {
-      cartItems = items;
-      isLoading = false;
-    });
-  }
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(sid) // ← ensure sid is a non-empty String
+          .get();
 
-  Future<void> removeCartItem(String userId, String productId) async {
-    debugPrint(
-        'Removing product with ID: $productId from cart for user: $userId'); // Logging product removal attempt
-    final cartRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('cart');
-
-    final cartDocs =
-        await cartRef.where('productId', isEqualTo: productId).get();
-    if (cartDocs.docs.isEmpty) {
-      debugPrint(
-          'No matching products found for product ID: $productId'); // Logging if no product was found
+      sellerBankImages[sid] =
+          userDoc.exists ? (userDoc.data()?['bankImage'] as String?) : null;
     }
 
-    for (var doc in cartDocs.docs) {
-      await doc.reference.delete();
-      debugPrint(
-          'Product with ID: $productId removed from Firestore'); // Logging successful removal
-    }
+    setState(() => isLoading = false);
+  }
+
+  double getTotalPrice() {
+    return order?.items.fold<double>(
+          0.0,
+          (sum, item) => sum + item.price * item.quantity,
+        ) ??
+        0.0;
   }
 
   int getTotalQuantity() {
-    int totalQuantity = 0;
-    for (var cartItem in cartItems) {
-      totalQuantity += cartItem.numOfItem; // Assuming 'quantity' is an int
-    }
-    return totalQuantity;
+    return order?.items.fold<int>(
+          0,
+          (sum, item) => sum + item.quantity,
+        ) ??
+        0;
   }
 
   @override
   Widget build(BuildContext context) {
-    double totalPrice = 0.0;
-    int totalQuantity = 0;
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (order == null) {
+      return const Scaffold(
+        body: Center(child: Text("Order not found.")),
+      );
+    }
 
-    // Calculate total price and quantity
-    for (var cartItem in cartItems) {
-      totalPrice += cartItem.product.price * cartItem.numOfItem;
-      totalQuantity += cartItem.numOfItem;
+    // Group items by seller
+    final grouped = <String, List<OrderItem>>{};
+    for (var itm in order!.items) {
+      grouped.putIfAbsent(itm.productUserId, () => []).add(itm);
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Payment", style: TextStyle(color: Colors.black)),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+      appBar: AppBar(title: const Text("Payment")),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: grouped.entries.map((entry) {
+          final sellerId = entry.key;
+          final items = entry.value;
+          final bankUrl = sellerBankImages[sellerId] ?? '';
+          final sellerTotal =
+              items.fold<double>(0.0, (sum, i) => sum + i.price * i.quantity);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Touch `n Go eWallet',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text("Seller: $sellerId",
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              if (bankUrl.isNotEmpty)
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FullScreenImageView(imageUrl: bankUrl),
+                      ),
+                    );
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(bankUrl, height: 150),
+                  ),
+                )
+              else
+                const Text("Bank image not available",
+                    style: TextStyle(color: Colors.red)),
+              const SizedBox(height: 8),
+              ...items.map((i) => ListTile(
+                    title: Text(i.title),
+                    subtitle:
+                        Text("${i.quantity} × RM${i.price.toStringAsFixed(2)}"),
+                    trailing: Text(
+                      "RM${(i.price * i.quantity).toStringAsFixed(2)}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  )),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "Subtotal: RM${sellerTotal.toStringAsFixed(2)}",
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
-              SizedBox(height: 8),
-              Container(
-                child: Image.asset('assets/images/qr.jpg'),
-              ),
-              SizedBox(height: 16),
-              // Column(
-              //   children: [
-              //     Text(
-              //       'Cart Items',
-              //       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              //     ),
-              //     Text(
-              //       "$totalQuantity items", // Display total quantity here
-              //       style: Theme.of(context).textTheme.bodySmall,
-              //     ),
-              //   ],
-              // ),
-              SizedBox(height: 8),
+              const Divider(thickness: 2),
+              const SizedBox(height: 16),
             ],
-          ),
-        ),
+          );
+        }).toList(),
       ),
       bottomNavigationBar: PaidCard(
-          totalPrice: totalPrice,
-          totalQuantity: totalQuantity), // Pass total price and quantity
+        totalPrice: getTotalPrice(),
+        totalQuantity: getTotalQuantity(),
+      ),
+    );
+  }
+}
+
+class FullScreenImageView extends StatelessWidget {
+  final String imageUrl;
+
+  const FullScreenImageView({Key? key, required this.imageUrl})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Center(
+        child: InteractiveViewer(
+          panEnabled: true,
+          minScale: 1,
+          maxScale: 4,
+          child: Image.network(imageUrl),
+        ),
+      ),
     );
   }
 }

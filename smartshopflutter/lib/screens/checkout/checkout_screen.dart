@@ -42,8 +42,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     setState(() {
       cartItems = items;
       isLoading = false;
-    });
+     });
   }
+
+  
 
   Future<void> removeCartItem(String userId, String productId) async {
     debugPrint('Removing product with ID: $productId from cart for user: $userId'); // Logging product removal attempt
@@ -122,33 +124,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       child: ListView.builder(
                         itemCount: cartItems.length,
                         itemBuilder: (context, index) => Padding(
+                       
+
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Dismissible(
-                            key: Key(cartItems[index].product.id.toString()),
-                            direction: DismissDirection.endToStart,
-                            onDismissed: (direction) async {
-                              final productId = cartItems[index].product.id;
-                              final userId = await getUserID();
-                              if (userId != null) {
-                                setState(() => cartItems.removeAt(index));
-                                await removeCartItem(userId, productId);
-                              }
-                            },
-                            background: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 31, 81, 21),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Spacer(),
-                                  SvgPicture.asset("assets/icons/Trash.svg"),
-                                ],
-                              ),
-                            ),
-                            child: CartCard(cart: cartItems[index]),
-                          ),
+                          child: CartCard(cart: cartItems[index]),
                         ),
                       ),
                     ),

@@ -20,12 +20,18 @@ class SellListScreen extends StatefulWidget {
 class _SellListScreenState extends State<SellListScreen> {
   bool isLoading = true;
   bool hasProfile = false;
+  late Future<List<Product>> _productsFuture;
 
   @override
   void initState() {
     super.initState();
     _checkUserProfile();
+    _productsFuture = ProductsRepository.fetchUserProducts();
+
   }
+
+
+ 
 
   Future<void> _checkUserProfile() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -78,12 +84,12 @@ class _SellListScreenState extends State<SellListScreen> {
       );
     }
 
-    return Scaffold(
+       return Scaffold(
       appBar: AppBar(title: const Text("Your Products")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<List<Product>>(
-          future: ProductsRepository.fetchUserProducts(),
+          future: _productsFuture,
           builder: (ctx, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
