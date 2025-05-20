@@ -9,7 +9,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
 import '../../../constants.dart';
-import '../../otp/otp_screen.dart';
 
 class CompleteProfileForm extends StatefulWidget {
   const CompleteProfileForm({super.key});
@@ -31,6 +30,10 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
   File? bankImage;
 
   final ImagePicker _picker = ImagePicker();
+
+  // Add these error constants to your constants.dart or define here
+  static const String kProfileImageNullError = "Please upload a profile picture";
+  static const String kBankImageNullError = "Please upload a bank QR image";
 
   void addError({String? error}) {
     if (!errors.contains(error)) {
@@ -54,8 +57,10 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
       setState(() {
         if (isProfile) {
           profileImage = File(pickedFile.path);
+          removeError(error: kProfileImageNullError);
         } else {
           bankImage = File(pickedFile.path);
+          removeError(error: kBankImageNullError);
         }
       });
     }
@@ -72,14 +77,33 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
     }
   }
 
+  bool validateImages() {
+    bool valid = true;
+
+    if (profileImage == null) {
+      addError(error: kProfileImageNullError);
+      valid = false;
+    } else {
+      removeError(error: kProfileImageNullError);
+    }
+
+    if (bankImage == null) {
+      addError(error: kBankImageNullError);
+      valid = false;
+    } else {
+      removeError(error: kBankImageNullError);
+    }
+
+    return valid;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(
         children: [
-          // First Name, Last Name, Phone, Address (same as before)...
-
+          // First Name
           TextFormField(
             onSaved: (newValue) => firstName = newValue,
             onChanged: (value) {
@@ -100,6 +124,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             ),
           ),
           const SizedBox(height: 20),
+
+          // Last Name
           TextFormField(
             onSaved: (newValue) => lastName = newValue,
             decoration: const InputDecoration(
@@ -110,6 +136,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             ),
           ),
           const SizedBox(height: 20),
+
+          // Phone Number
           TextFormField(
             keyboardType: TextInputType.phone,
             onSaved: (newValue) => phoneNumber = newValue,
@@ -131,6 +159,8 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
             ),
           ),
           const SizedBox(height: 20),
+
+          // Address
           TextFormField(
             onSaved: (newValue) => address = newValue,
             onChanged: (value) {
@@ -156,7 +186,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           // Profile Picture Picker
           Row(
             children: [
-              Expanded(child: Text("Profile Picture:")),
+              const Expanded(child: Text("Profile Picture:")),
               TextButton.icon(
                 icon: const Icon(Icons.upload),
                 label: const Text("Choose"),
@@ -171,7 +201,7 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           // Bank Picture Picker
           Row(
             children: [
-              Expanded(child: Text("QR:")),
+              const Expanded(child: Text("QR:")),
               TextButton.icon(
                 icon: const Icon(Icons.upload),
                 label: const Text("Choose"),
@@ -182,19 +212,22 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
           if (bankImage != null) Image.file(bankImage!, height: 100),
 
           const SizedBox(height: 20),
+
           FormError(errors: errors),
+
           const SizedBox(height: 20),
 
           // Submit Button
           ElevatedButton(
             onPressed: () async {
-              if (_formKey.currentState!.validate()) {
+              if (_formKey.currentState!.validate() && validateImages()) {
                 _formKey.currentState!.save();
 
                 try {
                   final user = FirebaseAuth.instance.currentUser;
                   if (user != null) {
                     String? token = await FirebaseMessaging.instance.getToken();
+
                     DocumentSnapshot userDoc = await FirebaseFirestore.instance
                         .collection('users')
                         .doc(user.uid)
@@ -203,10 +236,13 @@ class _CompleteProfileFormState extends State<CompleteProfileForm> {
                     Map<String, dynamic> userData = userDoc.exists
                         ? userDoc.data() as Map<String, dynamic>
                         : {};
+
                     List<String> fcmTokens =
                         List<String>.from(userData['fcmTokens'] ?? []);
 
-                    if (!fcmTokens.contains(token)) fcmTokens.add(token!);
+                    if (token != null && !fcmTokens.contains(token)) {
+                      fcmTokens.add(token);
+                    }
 
                     // Upload images
                     String? profileUrl;

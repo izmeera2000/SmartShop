@@ -6,7 +6,7 @@ import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
 import '../../../constants.dart';
 import '../../complete_profile/complete_profile_screen.dart';
- 
+
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
 
@@ -20,6 +20,8 @@ class _SignUpFormState extends State<SignUpForm> {
   String? password;
   String? conform_password;
   bool remember = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   final List<String?> errors = [];
 
   void addError({String? error}) {
@@ -44,6 +46,7 @@ class _SignUpFormState extends State<SignUpForm> {
       key: _formKey,
       child: Column(
         children: [
+          // Email
           TextFormField(
             keyboardType: TextInputType.emailAddress,
             onSaved: (newValue) => email = newValue,
@@ -68,15 +71,15 @@ class _SignUpFormState extends State<SignUpForm> {
             decoration: const InputDecoration(
               labelText: "Email",
               hintText: "Enter your email",
-              // If  you are using latest version of flutter then lable text and hint text shown like this
-              // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
               suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
             ),
           ),
           const SizedBox(height: 20),
+
+          // Password
           TextFormField(
-            obscureText: true,
+            obscureText: _obscurePassword,
             onSaved: (newValue) => password = newValue,
             onChanged: (value) {
               if (value.isNotEmpty) {
@@ -96,18 +99,27 @@ class _SignUpFormState extends State<SignUpForm> {
               }
               return null;
             },
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: "Password",
               hintText: "Enter your password",
-              // If  you are using latest version of flutter then lable text and hint text shown like this
-              // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
             ),
           ),
           const SizedBox(height: 20),
+
+          // Confirm Password
           TextFormField(
-            obscureText: true,
+            obscureText: _obscureConfirmPassword,
             onSaved: (newValue) => conform_password = newValue,
             onChanged: (value) {
               if (value.isNotEmpty) {
@@ -127,17 +139,28 @@ class _SignUpFormState extends State<SignUpForm> {
               }
               return null;
             },
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: "Confirm Password",
               hintText: "Re-enter your password",
-              // If  you are using latest version of flutter then lable text and hint text shown like this
-              // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                  });
+                },
+              ),
             ),
           ),
+
+          // Form errors
           FormError(errors: errors),
           const SizedBox(height: 20),
+
+          // Submit Button
           ElevatedButton(
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
@@ -150,10 +173,8 @@ class _SignUpFormState extends State<SignUpForm> {
                     password: password!,
                   );
 
-                  // ✅ Registration successful, go to Complete Profile screen
                   Navigator.pushNamed(context, CompleteProfileScreen.routeName);
                 } on FirebaseAuthException catch (e) {
-                  // Handle Firebase Auth errors
                   String errorMessage = "Registration failed";
                   if (e.code == 'email-already-in-use') {
                     errorMessage = "This email is already in use.";

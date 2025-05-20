@@ -245,7 +245,7 @@ Future<void> _showUpdateStatusDialog(BuildContext context, String productId) asy
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text('\$${item['price']}',
+                                Text('RM${item['price']}',
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16)),

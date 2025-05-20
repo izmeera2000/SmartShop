@@ -6,8 +6,7 @@ import 'package:smartshopflutter/models/Product.dart';
 import 'package:smartshopflutter/repositories/products_repository.dart';
 import 'package:smartshopflutter/screens/sell/sell_edit_screen.dart';
 import 'package:smartshopflutter/screens/sell/sell_screen.dart';
-import 'package:smartshopflutter/screens/complete_profile/complete_profile_screen.dart'; // <- make sure to import it
-import 'package:smartshopflutter/screens/profile/edit_profile.dart'; // <- make sure to import it
+import 'package:smartshopflutter/screens/profile/edit_profile.dart';
 
 class SellListScreen extends StatefulWidget {
   static const String routeName = "/sell_list";
@@ -20,18 +19,12 @@ class SellListScreen extends StatefulWidget {
 class _SellListScreenState extends State<SellListScreen> {
   bool isLoading = true;
   bool hasProfile = false;
-  late Future<List<Product>> _productsFuture;
 
   @override
   void initState() {
     super.initState();
     _checkUserProfile();
-    _productsFuture = ProductsRepository.fetchUserProducts();
-
   }
-
-
- 
 
   Future<void> _checkUserProfile() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -50,7 +43,6 @@ class _SellListScreenState extends State<SellListScreen> {
 
     final data = doc.data();
 
-    // Required fields
     final requiredFields = [
       'firstName',
       'lastName',
@@ -61,10 +53,10 @@ class _SellListScreenState extends State<SellListScreen> {
     ];
 
     final isComplete = data != null &&
-        requiredFields.every((field) => data[field] != null && data[field].toString().trim().isNotEmpty);
+        requiredFields.every((field) =>
+            data[field] != null && data[field].toString().trim().isNotEmpty);
 
     if (!isComplete) {
-      // Navigate to complete profile
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacementNamed(context, EditProfileScreen.routeName);
       });
@@ -84,19 +76,20 @@ class _SellListScreenState extends State<SellListScreen> {
       );
     }
 
-       return Scaffold(
+    return Scaffold(
       appBar: AppBar(title: const Text("Your Products")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<Product>>(
-          future: _productsFuture,
-          builder: (ctx, snapshot) {
+        child: StreamBuilder<List<Product>>(
+          stream: ProductsRepository.userProductsStream(),
+          builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
               return Center(child: Text("Error: ${snapshot.error}"));
             }
+
             final products = snapshot.data;
             if (products == null || products.isEmpty) {
               return const Center(child: Text("No products available"));
@@ -110,8 +103,8 @@ class _SellListScreenState extends State<SellListScreen> {
                 mainAxisSpacing: 20,
                 crossAxisSpacing: 16,
               ),
-              itemBuilder: (context, idx) {
-                final product = products[idx];
+              itemBuilder: (context, index) {
+                final product = products[index];
                 return ProductCard(
                   product: product,
                   onPress: () {

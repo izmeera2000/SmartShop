@@ -90,7 +90,7 @@ class OrderDetailsUser extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Text('User ID: $userId'),
-              Text('Total Price: \$${data['totalPrice']}'),
+              Text('Total Price: RM${data['totalPrice']}'),
               Text('Status: $status'),
               Text('Delivery Address: ${data['deliveryAddress']}'),
               const SizedBox(height: 16),
@@ -124,7 +124,7 @@ class OrderDetailsUser extends StatelessWidget {
                             Text('Status: $itemStatus'),
                           ],
                         ),
-                        trailing: Text('\$${item['price']}'),
+                        trailing: Text('RM${item['price']}'),
                       );
                     }).toList(),
 

@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:smartshopflutter/models/Product.dart';
 import 'package:smartshopflutter/components/product_card.dart';
 import 'package:smartshopflutter/components/save_details.dart';
+import 'package:smartshopflutter/repositories/products_repository.dart';
 import '../details/details_screen.dart';
 import '../../../helper/permission.dart';
 
@@ -89,6 +90,7 @@ class _SellScreenState extends State<SellScreen> {
       };
 
       await FirebaseFirestore.instance.collection('products').add(productData);
+      ProductsRepository.clearCache(); // 👈 force refresh
 
       debugPrint("Product uploaded successfully!");
 
