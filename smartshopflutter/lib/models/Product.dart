@@ -53,7 +53,7 @@ factory Product.fromFirestore(Map<String, dynamic> data, String docId) {
       rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
       price: (data['price'] as num?)?.toDouble() ?? 0.0,
       isFavourite: data['isFavourite'] ?? false,
-      isPopular: data['isPopular'] ?? false,
+      isPopular: data['popular'] ?? false,
       userId: data['userId'] ?? '',
       stock: (data['stock'] as num?)?.toInt() ?? 0,
       category: data['category'], // nullable String
