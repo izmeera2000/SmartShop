@@ -33,7 +33,7 @@ static Future<List<Product>> fetchPopularProducts() async {
   final uid = FirebaseAuth.instance.currentUser?.uid;
   Query<Map<String, dynamic>> query = FirebaseFirestore.instance
       .collection('products')
-      .where('isPopular', isEqualTo: true);
+      .where('popular', isEqualTo: true);
 
   // Fetch the popular products, filter by isPopular
   final snap = await query.get();
